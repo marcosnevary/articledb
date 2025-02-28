@@ -1,0 +1,22 @@
+{
+    "foldit": {
+        "mauricio": {
+            "objetivo": "aaaa",
+            "lacunas": "bbbb"
+        },
+        "marcos": {
+            "objetivo": "aaaa",
+            "lacunas": "bbbb"
+        }
+    },
+    "teste": {
+        "mauricio": {
+            "objetivo": "aaaa",
+            "lacunas": "bbbb"
+        },
+        "marcos": {
+            "objetivo": "aaaa",
+            "lacunas": "bbbb"
+        }
+    }
+}
