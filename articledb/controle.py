@@ -1,4 +1,4 @@
-import tela_cadastro
+import tela_cadastro, tela_sintese
 import flet as ft
 import banco_de_dados as bd
 import controle
@@ -8,6 +8,7 @@ def init(p):
     pagina = p
     telas = {
         '1': tela_cadastro.view(),
+        '3': tela_sintese.view()
     }
 
 
