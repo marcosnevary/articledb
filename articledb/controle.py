@@ -1,4 +1,4 @@
-import tela_cadastro
+import tela_principal
 import flet as ft
 import banco_de_dados as bd
 import controle
@@ -7,7 +7,7 @@ def init(p):
     global pagina, telas, banco_de_dados
     pagina = p
     telas = {
-        '1': tela_cadastro.view(),
+        '1': tela_principal.view(),
     }
 
 
