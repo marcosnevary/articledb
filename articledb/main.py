@@ -6,7 +6,7 @@ def main(pagina: ft.Page):
     pagina.title = "ArticleDB"  
     pagina.on_route_change = controle.controle_de_rota  
     pagina.theme_mode  = "light"
-    pagina.go('3')
+    pagina.go('1')
 
 
 ft.app(target=main)
