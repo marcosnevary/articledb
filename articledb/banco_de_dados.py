@@ -7,12 +7,11 @@ def carregando_dados_tabela():
 
     try: #ARQUIVO JA EXISTE, RETORNANDO A LISTA PRA TELA
         with open(r"articledb\dados\dados_tabela.txt", mode="r") as arq:
-            return [linha.split("\n")[0] for linha in arq.readlines()]
+            return [linha.split("\n")[0].split(",") for linha in arq.readlines()]
 
     except: #ARQUIVO NAO EXISTE, CRIANDO ARQUIVO E RETORNANDO LISTA VAZIA
         with open(r"articledb\dados\dados_tabela.txt", mode="x") as arq:
             return []
-
 
 
 
