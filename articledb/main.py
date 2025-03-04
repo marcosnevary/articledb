@@ -8,6 +8,4 @@ def main(pagina: ft.Page):
     pagina.theme_mode  = "light"
     pagina.go('1')
     
-
-
 ft.app(target=main)

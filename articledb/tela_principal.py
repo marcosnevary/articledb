@@ -1,6 +1,7 @@
 import controle
 import flet as ft
 import banco_de_dados as bd
+import validacoes as val
 
 componentes = {
         'dt_tabela': ft.Ref[ft.DataTable](),
@@ -28,7 +29,7 @@ def adiciona_leitor(e:ft.ControlEvent):
         
         #atualizando as linhas da tabela
         for id_linha, linha in enumerate(tabela_dados_artigos.rows):
-            tabela_dados_artigos.rows[id_linha].cells.append(ft.DataCell(ft.ElevatedButton(text=nome_leitor, on_click=sintese_leitor, key=id_linha)))
+            tabela_dados_artigos.rows[id_linha].cells.append(ft.DataCell(ft.ElevatedButton(text=nome_leitor, on_click=abrir_sintese_leitor, key=id_linha)))
 
         #atualizando todas as linhas no txt da tabela
         lista_salvar_dados_tabela = []
@@ -55,6 +56,10 @@ def adiciona_leitor(e:ft.ControlEvent):
         controle.pagina.close(modal_nome_leitor)
         componentes["tf_novo_leitor"] = ""
 
+        #resetando a referencia de pesquisa
+        componentes["tf_pesquisa"].current.value = ""
+        controle.pagina.update()
+
 def deletar_artigo(e:ft.ControlEvent):
     #pegando o id do artigo
     id_linha = e.control.key
@@ -74,15 +79,21 @@ def deletar_artigo(e:ft.ControlEvent):
 
     bd.atualizando_dados_sinteses(dic_artigo_sintese)
 
-    #atualizando a tabela da tela principal
-    atualizar_leitores_tela_principal() #rows
-    tabela_dados_artigos.update()       #tabela na tela
+    #atualizando a tabela da tela principal e resetando a referencia de pesquisa
+    atualizar_leitores_tela_principal(bd.carregando_dados_tabela())     #rows
+    componentes["tf_pesquisa"].current.value = ""                       #ref de pesquisa
+    controle.pagina.update()                                            #tabela na tela
 
 def editar_artigo(e):
     controle.id_artigo_edicao = e.control.key
+
+    #resetando a referencia de pesquisa
+    componentes["tf_pesquisa"].current.value = ""
+    controle.pagina.update()
+
     controle.pagina.go("4")
 
-def sintese_leitor(e:ft.ControlEvent):
+def abrir_sintese_leitor(e:ft.ControlEvent):
     botao_nome_leitor = e.control.text
     botao_id_linha = e.control.key
     
@@ -90,15 +101,19 @@ def sintese_leitor(e:ft.ControlEvent):
     controle.nome_leitor_sintese = botao_nome_leitor
     controle.artigo_sintese = bd.carregando_dados_tabela()[botao_id_linha][0]
 
+    #resetando a referencia de pesquisa
+    componentes["tf_pesquisa"].current.value = ""
+    controle.pagina.update()
+
     controle.pagina.go("3")
 
-def atualizar_leitores_tela_principal():
+def atualizar_leitores_tela_principal(lista_artigos:list):
     """Essa funcao serve pra atualizar os botoes os leitores ao mudar ou adicionar uma sintese na tela de sintese"""
 
     #resetando as linhas
     tabela_dados_artigos.rows = []
 
-    for id_linha, linha in enumerate(bd.carregando_dados_tabela()): #carregando cada linha do arquivo
+    for id_linha, linha in enumerate(lista_artigos): #carregando cada linha do arquivo
         #criando os valores da linha pra cada coluna, comecando pelos 2 botoes
         lista_colunas = [ft.DataCell(ft.IconButton(icon=ft.Icons.DELETE, tooltip="REMOVER", key=id_linha, on_click=deletar_artigo)), ft.DataCell(ft.IconButton(icon=ft.Icons.EDIT, tooltip="EDITAR", key=id_linha, on_click=editar_artigo))]
 
@@ -111,28 +126,19 @@ def atualizar_leitores_tela_principal():
             else:
                 #pegando a sintese do leitor (carregando o dicionario do txt, entrando no dicionario com o nome do artigo, dps no dicionario do leitor e, por fim, resgatando a chave objetivo)
                 sintese_leitor = bd.carregando_dados_sintese()[linha[0]][coluna]["objetivo"]
-                lista_colunas.append(ft.DataCell(ft.ElevatedButton(text=coluna, bgcolor="#FFFFFF" if sintese_leitor == "" else "#0000ff", on_click=sintese_leitor, key=id_linha)))
+                lista_colunas.append(ft.DataCell(ft.ElevatedButton(text=coluna, bgcolor="#FFFFFF" if sintese_leitor == "" else "#0000ff", on_click=abrir_sintese_leitor, key=id_linha)))
 
         #dando o append da linha se o arquivo nao estiver vazio
-        if len(bd.carregando_dados_tabela()) > 0: tabela_dados_artigos.rows.append(ft.DataRow(cells=lista_colunas))
+        if len(lista_artigos) > 0: tabela_dados_artigos.rows.append(ft.DataRow(cells=lista_colunas))
 
-# def filtrar_dados(query):
-#     return [
-#             ft.DataRow(cells=preencher_linha_tabela(cadastro))
-#             for cadastro in con.banco_de_dados
-#             if query in cadastro['nome'] or query in cadastro['telefone']
-#         ]
-
-# def pesquisar(e):
-#     query = componentes['tf_pesquisa'].current.value
-#     componentes['tabela'].current.rows = filtrar_dados(query)
-#     con.page.update()
-
-# def atualizar(e):
-#     usuario = e.control.key    
-#     con.tela_atualizar.init(usuario)
-#     con.page.go('3')
-
+def pesquisar_artigo(e):
+    #Pegando a ref da esquisa
+    pesquisa = componentes['tf_pesquisa'].current.value
+    
+    #atualizando a tabela com a lista filtrada 
+    atualizar_leitores_tela_principal([artigo for artigo in bd.carregando_dados_tabela() if val.achar_nome_tela_principal(pesquisa, artigo)])
+    tabela_dados_artigos.update()
+    
 
 #---------------------------------------------------------------------- VARIAVEIS ---------------------------------------------------------------------
 modal_nome_leitor = ft.AlertDialog(
@@ -168,7 +174,7 @@ if len(bd.carregando_dados_tabela()) > 0:
         tabela_dados_artigos.columns.append(ft.DataColumn(ft.Text(f"Leitor {id_coluna + 1}")))
 
 #adicionando as linhas que ja estavam no banco de dados
-atualizar_leitores_tela_principal()
+atualizar_leitores_tela_principal(bd.carregando_dados_tabela())
 
 #------------------------------------------------------------------------- VIEW -----------------------------------------------------------------------
 def view():
@@ -176,7 +182,7 @@ def view():
         "tela principal",
         [
             #TEXTFIELD DA PESQUISA
-            ft.TextField(ref=componentes['tf_pesquisa'], label='pesquisar', icon='search'),
+            ft.TextField(ref=componentes['tf_pesquisa'], label='pesquisar', icon='search', on_change=pesquisar_artigo),
             
             #LINHA DE ADICIONAR NOVO LEITOR E CADASTRAR NOVO ARTIGO
             ft.Row([

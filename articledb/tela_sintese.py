@@ -38,7 +38,7 @@ def voltar(e):
     controle.artigo_sintese = ""
     controle.nome_leitor_sintese = ""
 
-    tela_principal.atualizar_leitores_tela_principal()
+    tela_principal.atualizar_leitores_tela_principal(bd.carregando_dados_tabela())
     controle.pagina.go('1')
 
 
