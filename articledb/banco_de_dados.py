@@ -1,54 +1,54 @@
-import controle
+import os
 
-#-------------------------------------------------------------- FUNCOES DADOS DA TABELA ------------------------------------------------------------------------------
+CAMINHO_TABELA = os.path.join("articledb", "dados", "dados_tabela.txt")
+CAMINHO_SINTESE = os.path.join("articledb", "dados", "dados_sintese.txt")
 
-def carregando_dados_tabela():
-    """Essa funcao vai carregar os dados da tabela da tela principal"""
+def obter_dados_tabela():
+    """Obtem os dados da tabela da tela principal."""
 
-    try: #ARQUIVO JA EXISTE, RETORNANDO A LISTA PRA TELA
-        with open(r"articledb\dados\dados_tabela.txt", mode="r") as arq:
+    try:
+        with open(CAMINHO_TABELA, mode="r") as arq:
             return [linha.split("\n")[0].split(",") for linha in arq.readlines()]
 
-    except: #ARQUIVO NAO EXISTE, CRIANDO ARQUIVO E RETORNANDO LISTA VAZIA
-        with open(r"articledb\dados\dados_tabela.txt", mode="x") as arq:
+    except:
+        with open(CAMINHO_TABELA, mode="x") as arq:
             return []
 
+def obter_dados_tabela_lista():
+    """Obtem os dados da tabela da tela principal e retorna uma lista."""
+
+    try:
+        with open(CAMINHO_TABELA, mode="r") as arq:
+            print(arq.readlines())
+            print([linha.split("\n")[0].split(",") for linha in arq.readlines()])
+            return [linha.split("\n")[0].split(",") for linha in arq.readlines()]
+
+    except:
+        with open(CAMINHO_TABELA, mode="x") as arq:
+            return []
+
+def atualizar_dados_tabela(dados_tabela:list):
+    """Atualiza os dados que ja existem da tabela da tela principal."""
+
+    with open(CAMINHO_TABELA, mode="w") as arq:
+        arq.writelines([f"{linha}\n" for linha in dados_tabela])
 
 
-def atualizando_dados_tabela(dados_tabela:list):
-    """Essa funcao vai atualizar os dados que ja existem da tabela da tela principal"""
-    
-    try: #ARQUIVO JA EXISTE, SALVANDO TUDO
-        with open(r"articledb\dados\dados_tabela.txt", mode="w") as arq:
-            arq.writelines([f"{linha}\n" for linha in dados_tabela])
+def obter_dados_sintese():
+    """Obtem os dados da tabela da tela principal."""
 
-    except: #ARQUIVO NAO EXISTE, CRIANDO ARQUIVO E SALVANDO
-        with open(r"articledb\dados\dados_tabela.txt", mode="x") as arq:
-            pass
-
-
-
-#-------------------------------------------------------------- FUNCOES DADOS DA SINTESE -----------------------------------------------------------------------------
-
-def carregando_dados_sintese():
-    """Essa funcao vai carregar os dados da tabela da tela principal"""
-
-    try: #ARQUIVO JA EXISTE, RETORNANDO O DICIONARIO DO ARQUIVO
-        with open(r"articledb\dados\dados_sintese.txt", mode="r") as arq:
+    try:
+        with open(CAMINHO_SINTESE, mode="r") as arq:
             return eval(arq.read())
+    except:
+        with open(CAMINHO_SINTESE, mode="x") as arq:
+            return {}
 
-    except: #ARQUIVO NAO EXISTE, CRIANDO ARQUIVO E RETORNANDO DICIONARIO VAZIO
-        with open(r"articledb\dados\dados_sintese.txt", mode="x") as arq:
-            return dict()
 
+def atualizar_dados_sintese(dados_sintese:dict):
+    """Atualiza os dados que ja existem da tela de sintese (pela tela principal, ao adicionar uma coluna de leitor nova)."""
 
-def atualizando_dados_sinteses(dados_sintese:dict):
-    """Essa funcao vai atualizar os dados que ja existem da tela de sintese (pela tela principal, ao adicionar uma coluna de leitor nova)"""
-    
-    try: #ARQUIVO JA EXISTE, SALVANDO TUDO
-        with open(r"articledb\dados\dados_sintese.txt", mode="w") as arq:
-            arq.write(str(dados_sintese))
+    with open(CAMINHO_SINTESE, mode="w") as arq:
+        arq.write(str(dados_sintese))
 
-    except: #ARQUIVO NAO EXISTE, CRIANDO ARQUIVO E SALVANDO
-        with open(r"articledb\dados\dados_sintese.txt", mode="x") as arq:
-            pass
+obter_dados_tabela_lista()
