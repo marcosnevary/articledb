@@ -2,6 +2,9 @@ import controle
 import flet as ft
 import banco_de_dados as bd
 import validacoes as val
+import os
+
+IMAGEM_CAMINHO = os.path.join("articledb", "imagens", "header.png")
 
 componentes = {
         'tf_pesquisa': ft.Ref[ft.TextField](),
@@ -12,14 +15,14 @@ componentes = {
 tabela = ft.DataTable(
     show_bottom_border=True,
     columns=[
-        ft.DataColumn(ft.Text("Remover")),
-        ft.DataColumn(ft.Text("Editar")),
-        ft.DataColumn(ft.Text("Título")),
-        ft.DataColumn(ft.Text("Link")),
-        ft.DataColumn(ft.Text("Autores")),
-        ft.DataColumn(ft.Text("Ano")),
-        ft.DataColumn(ft.Text("Local de\nPublicação")),
-        ft.DataColumn(ft.Text("Abstracts"))
+        ft.DataColumn(ft.Text("Excluir", weight="bold")),
+        ft.DataColumn(ft.Text("Editar", weight="bold")),
+        ft.DataColumn(ft.Text("Título", weight="bold")),
+        ft.DataColumn(ft.Text("Link", weight="bold")),
+        ft.DataColumn(ft.Text("Autores", weight="bold")),
+        ft.DataColumn(ft.Text("Ano", weight="bold")),
+        ft.DataColumn(ft.Text("Local de\nPublicação", weight="bold")),
+        ft.DataColumn(ft.Text("Abstracts", weight="bold"))
     ]
 )
 
@@ -48,7 +51,7 @@ def adicionar_leitor(e:ft.ControlEvent):
         
     elif len(tabela.columns) < 18 and not leitor_existe: #nome nao e vazio, tem espaco pra mais leitores e o leitor ainda nao existe
         tabela.columns.append(
-            ft.DataColumn(ft.Text(f"Leitor {len(tabela.columns) - 7}"))
+            ft.DataColumn(ft.Text(f"Leitor {len(tabela.columns) - 7}", weight="bold"))
         ) #adicionando a coluna na tabela
         
         for indice, linha in enumerate(tabela.rows): #adicionando o botao de leitor em cada linha
@@ -147,7 +150,7 @@ def atualizar_tabela(lista_artigos:list):
                 ft.IconButton(
                     icon=ft.Icons.DELETE, 
                     icon_color="#1E3A8A",
-                    tooltip="REMOVER", 
+                    tooltip="Excluir", 
                     key=id_linha, 
                     on_click=abrir_modal_deletar_artigo
                 )
@@ -156,7 +159,7 @@ def atualizar_tabela(lista_artigos:list):
                 ft.IconButton(
                     icon=ft.Icons.EDIT, 
                     icon_color="#1E3A8A",
-                    tooltip="EDITAR", 
+                    tooltip="Editar", 
                     key=id_linha, 
                     on_click=editar_artigo
                 )
@@ -174,8 +177,8 @@ def atualizar_tabela(lista_artigos:list):
                     ft.DataCell(
                         ft.ElevatedButton(
                             text=coluna, 
-                            color="#212121" if sintese_leitor == "" else "#EDEDED",
-                            bgcolor="#FFFFFF" if sintese_leitor == "" else "#1E3A8A",
+                            color="#212121" if sintese_leitor == "" else "#FFFFFF",
+                            bgcolor="#FFFFFF" if sintese_leitor == "" else "#3254b4",
                             on_click=abrir_sintese, 
                             key=id_linha
                         )
@@ -257,33 +260,59 @@ if len(bd.obter_dados_tabela()) > 0:
 #atualizando a tabela inicialmente
 atualizar_tabela(bd.obter_dados_tabela())
 
-#view
 def view():
     return ft.View(
-        "Tela Principal",
-        [
-            ft.TextField(
-                ref=componentes['tf_pesquisa'], 
-                label='Pesquisar', 
-                icon='search', 
-                on_change=pesquisar_artigo,
-                input_filter=ft.InputFilter(regex_string=r"^[a-zA-Z ]*$")
-            ),
-            ft.Row(
-                [
-                    ft.ElevatedButton(
-                        text="Adicionar Artigo", 
-                        icon=ft.Icons.ADD, 
-                        on_click=lambda e: controle.pagina.go("2")
+            "Tela Principal",
+            controls=[
+                ft.Image(src=IMAGEM_CAMINHO, width=1920, height=123, fit="COVER"),
+                ft.Container(
+                    content=ft.Column(
+                        [
+                            ft.TextField(
+                                ref=componentes["tf_pesquisa"],
+                                label="Pesquisar",
+                                icon='search', 
+                                on_change=pesquisar_artigo,
+                                input_filter=ft.InputFilter(regex_string=r"^[a-zA-Z ]*$")
+                            ),
+                            ft.Row(
+                                [
+                                    ft.ElevatedButton(
+                                        text="Adicionar Artigo",
+                                        color="black",
+                                        bgcolor="white",
+                                        icon=ft.Icons.ADD,
+                                        icon_color="black",
+                                        on_click=lambda e: controle.pagina.go("2")
+                                    ),
+                                    ft.ElevatedButton(
+                                        text="Adicionar Leitor", 
+                                        color="black",
+                                        bgcolor="white",
+                                        icon=ft.Icons.ADD,
+                                        icon_color="black",
+                                        on_click=lambda e: controle.pagina.open(modal_nome_leitor)
+                                    )
+                                ],
+                                alignment=ft.MainAxisAlignment.CENTER
+                            ),
+                            ft.Container(
+                                content=ft.Row([tabela], scroll=ft.ScrollMode.ALWAYS),
+                                border=ft.border.all(1.2, "black"),  # Adiciona borda fixa
+                                width=2000,
+                                border_radius=10,
+                                padding=0.4
+                            )
+                        ]
                     ),
-                    ft.ElevatedButton(
-                        text="Adicionar Leitor", 
-                        icon=ft.Icons.ADD, 
-                        on_click=lambda e: controle.pagina.open(modal_nome_leitor)
-                    )
-                ]
-            ),
-            ft.Row([tabela], scroll=ft.ScrollMode.ALWAYS)
-        ],
-        scroll=ft.ScrollMode.ALWAYS
+                    bgcolor=ft.colors.WHITE,
+                    expand=True,
+                    margin=-10,
+                    padding=ft.Padding(left=100, right=100, top=20, bottom=0),
+                )
+            ],
+            scroll=ft.ScrollMode.HIDDEN,
+            bgcolor=ft.colors.WHITE,
+            padding=0,
     )
+        
