@@ -14,6 +14,18 @@ def obter_dados_tabela():
         with open(CAMINHO_TABELA, mode="x") as arq:
             return []
 
+def obter_dados_tabela_lista():
+    """Obtem os dados da tabela da tela principal e retorna uma lista."""
+
+    try:
+        with open(CAMINHO_TABELA, mode="r") as arq:
+            print(arq.readlines())
+            print([linha.split("\n")[0].split(",") for linha in arq.readlines()])
+            return [linha.split("\n")[0].split(",") for linha in arq.readlines()]
+
+    except:
+        with open(CAMINHO_TABELA, mode="x") as arq:
+            return []
 
 def atualizar_dados_tabela(dados_tabela:list):
     """Atualiza os dados que ja existem da tabela da tela principal."""
@@ -38,3 +50,5 @@ def atualizar_dados_sintese(dados_sintese:dict):
 
     with open(CAMINHO_SINTESE, mode="w") as arq:
         arq.write(str(dados_sintese))
+
+obter_dados_tabela_lista()
