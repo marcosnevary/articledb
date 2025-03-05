@@ -17,5 +17,3 @@ def achar_nome_tela_principal(string:str, artigo:list)->list:
 
 
 
-
-

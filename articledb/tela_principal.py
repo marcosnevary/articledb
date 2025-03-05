@@ -139,7 +139,6 @@ def pesquisar_artigo(e):
     atualizar_leitores_tela_principal([artigo for artigo in bd.carregando_dados_tabela() if val.achar_nome_tela_principal(pesquisa, artigo)])
     tabela_dados_artigos.update()
     
-
 #---------------------------------------------------------------------- VARIAVEIS ---------------------------------------------------------------------
 modal_nome_leitor = ft.AlertDialog(
         modal=True,
