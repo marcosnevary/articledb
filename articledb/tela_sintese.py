@@ -41,6 +41,7 @@ def voltar(e):
     tela_principal.atualizar_leitores_tela_principal(bd.carregando_dados_tabela())
     controle.pagina.go('1')
 
+
 def abrir_modal(e):
     controle.pagina.open(modal)
 

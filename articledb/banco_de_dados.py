@@ -27,6 +27,7 @@ def atualizando_dados_tabela(dados_tabela:list):
             pass
 
 
+
 #-------------------------------------------------------------- FUNCOES DADOS DA SINTESE -----------------------------------------------------------------------------
 
 def carregando_dados_sintese():

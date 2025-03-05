@@ -17,8 +17,8 @@ def init(p):
         #"4": tela_edicao.view(),
     }
 
+
 def controle_de_rota(route_event):
     pagina.views.clear()    
     pagina.views.append(telas[route_event.route])          
     pagina.update()
-    
