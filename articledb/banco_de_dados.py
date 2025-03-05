@@ -52,6 +52,3 @@ def atualizando_dados_sinteses(dados_sintese:dict):
     except: #ARQUIVO NAO EXISTE, CRIANDO ARQUIVO E SALVANDO
         with open(r"articledb\dados\dados_sintese.txt", mode="x") as arq:
             pass
-
-
-
