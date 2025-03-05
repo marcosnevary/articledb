@@ -1,13 +1,10 @@
 import tela_principal, tela_cadastro, tela_sintese, tela_edicao
 import flet as ft
 import banco_de_dados as bd
-#import controle
 
 def init(p):
-    global pagina, telas, banco_de_dados, artigo_sintese, nome_leitor_sintese, id_artigo_edicao
+    global pagina, telas, banco_de_dados, id_artigo_edicao
     pagina = p
-    artigo_sintese = ""
-    nome_leitor_sintese = ""
     id_artigo_edicao = None
     
     telas = {
@@ -20,5 +17,7 @@ def init(p):
 
 def controle_de_rota(route_event):
     pagina.views.clear()    
-    pagina.views.append(telas[route_event.route])          
+    if pagina.route == "3":
+        tela_sintese.atualizar_sintese('')
+    pagina.views.append(telas[route_event.route])        
     pagina.update()

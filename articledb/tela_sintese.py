@@ -3,7 +3,7 @@ import controle
 import banco_de_dados as bd
 import tela_principal
 
-dados_bd = bd.carregando_dados_sintese()
+dados_bd = bd.obter_dados_sintese()
 
 largura = 500
 
@@ -35,10 +35,11 @@ def mudar_cor_campo(e):
 
 
 def voltar(e):
-    controle.artigo_sintese = ""
-    controle.nome_leitor_sintese = ""
-
-    tela_principal.atualizar_leitores_tela_principal(bd.carregando_dados_tabela())
+    for chave in componentes.keys():
+        componentes[chave].current.border_color = ft.colors.BLACK
+        componentes[chave].current.focused_border_color = "#3C618B"
+        componentes[chave].current.update()
+    tela_principal.atualizar_leitores(bd.obter_dados_tabela())
     controle.pagina.go('1')
 
 
@@ -66,16 +67,19 @@ def salvar_e_sair(e):
             permissao = False
     if permissao:
         dados_finais = obter_dados_finais()
-        dados_bd[controle.artigo_sintese][controle.nome_leitor_sintese] = dados_finais
-        bd.atualizando_dados_sinteses(dados_bd)
+        dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
+        bd.atualizar_dados_sintese(dados_bd)
         voltar(e)
 
 
-def sair(e):
-    dados_iniciais = dados_bd[controle.artigo_sintese][controle.nome_leitor_sintese]
+def atualizar_sintese(e):
+    global dados_iniciais
+    dados_iniciais = dados_bd[tela_principal.artigo][tela_principal.leitor]
     for chave in componentes.keys():
         componentes[chave].current.value = dados_iniciais[chave]
 
+
+def sair(e):
     dados_finais = obter_dados_finais()
     if dados_finais != dados_iniciais:
         abrir_modal(e)
@@ -83,65 +87,90 @@ def sair(e):
         voltar(e)
 
 
+artigo = ft.TextField(
+    label="Artigo",
+    disabled=True,
+    value=" ",
+    width=largura
+)
+
+leitor = ft.TextField(
+    label="Leitor",
+    disabled=True,
+    value=" ",
+    width=largura
+)
+
 objetivo = ft.Container(
-     content=ft.TextField(
-          label="Objetivo",
-          ref=componentes["objetivo"],
-          width=largura,
-          multiline=True,
-          on_change=mudar_cor_campo
-     )
+    content=ft.TextField(
+        label="Objetivo",
+        ref=componentes["objetivo"],
+        width=largura,
+        multiline=True,
+        on_change=mudar_cor_campo
+    )
 )
 
 contribuicoes = ft.Container(
      content=ft.TextField(
-          label="Principais Contribuições",
-          ref=componentes["contribuicoes"],
-          width=largura,
-          multiline=True,
-          on_change=mudar_cor_campo
-     )
+        label="Principais Contribuições",
+        ref=componentes["contribuicoes"],
+        width=largura,
+        multiline=True,
+        on_change=mudar_cor_campo
+    )
 )
 
 lacunas = ft.Container(
      content=ft.TextField(
-          label="Lacunas Encontradas",
-          ref=componentes["lacunas"],
-          width=largura,
-          multiline=True,
-          on_change=mudar_cor_campo
-     )
+        label="Lacunas Encontradas",
+        ref=componentes["lacunas"],
+        width=largura,
+        multiline=True,
+        on_change=mudar_cor_campo
+    )
 )
 
 observacoes = ft.Container(
      content=ft.TextField(
-          label="Outras Observações",
-          ref=componentes["observacoes"],
-          width=largura,
-          multiline=True,
-          on_change=mudar_cor_campo
-     )
+        label="Outras Observações",
+        ref=componentes["observacoes"],
+        width=largura,
+        multiline=True,
+        on_change=mudar_cor_campo
+    )
 )
 
 modal = ft.AlertDialog(
-        modal=True,
-        title=ft.Text("Confirmação"),
-        content=ft.Text("Você quer sair sem salvar as alterações?"),
-        actions=[
-            ft.TextButton("Sim", on_click=voltar),
-            ft.TextButton("Não", on_click=fechar_modal)
-        ]
-    )
+    modal=True,
+    title=ft.Text("Confirmação"),
+    content=ft.Text("Você quer sair sem salvar as alterações?"),
+    actions=[
+        ft.TextButton("Sim", on_click=voltar),
+        ft.TextButton("Não", on_click=fechar_modal)
+    ]
+)
+
+def atualizar_sintese(e):
+    global dados_iniciais
+    dados_iniciais = dados_bd[tela_principal.artigo][tela_principal.leitor]
+    for chave in componentes.keys():
+        componentes[chave].current.value = dados_iniciais[chave]
+    artigo.value = tela_principal.artigo
+    leitor.value = tela_principal.leitor
+
 
 def view():
     return ft.View(
-                "Tela de Síntese",
-                [
-                    objetivo,
-                    contribuicoes,
-                    lacunas,
-                    observacoes,
-                    ft.ElevatedButton("Sair", on_click=sair),
-                    ft.ElevatedButton("Salvar e Sair", on_click=salvar_e_sair)
-                ]
-            )
+        "Tela de Síntese",
+        [
+           artigo,
+           leitor,
+           objetivo,
+           contribuicoes,
+           lacunas,
+           observacoes,
+           ft.ElevatedButton("Sair", on_click=sair),
+           ft.ElevatedButton("Salvar e Sair", on_click=salvar_e_sair) 
+        ]
+    )
