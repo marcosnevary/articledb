@@ -39,7 +39,7 @@ def voltar(e):
         componentes[chave].current.border_color = ft.colors.BLACK
         componentes[chave].current.focused_border_color = "#3C618B"
         componentes[chave].current.update()
-    tela_principal.atualizar_leitores(bd.obter_dados_tabela())
+    tela_principal.atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
 
 
