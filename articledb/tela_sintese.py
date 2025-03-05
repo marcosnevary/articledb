@@ -1,8 +1,8 @@
 import flet as ft
 import controle
 import banco_de_dados as bd
+import tela_principal
 
-artigo, nome = ("Titulo", "mauricio")
 dados_bd = bd.carregando_dados_sintese()
 
 largura = 500
@@ -35,6 +35,10 @@ def mudar_cor_campo(e):
 
 
 def voltar(e):
+    controle.artigo_sintese = ""
+    controle.nome_leitor_sintese = ""
+
+    tela_principal.atualizar_leitores_tela_principal(bd.carregando_dados_tabela())
     controle.pagina.go('1')
 
 
@@ -62,12 +66,16 @@ def salvar_e_sair(e):
             permissao = False
     if permissao:
         dados_finais = obter_dados_finais()
-        dados_bd[artigo][nome] = dados_finais
+        dados_bd[controle.artigo_sintese][controle.nome_leitor_sintese] = dados_finais
         bd.atualizando_dados_sinteses(dados_bd)
         voltar(e)
 
 
 def sair(e):
+    dados_iniciais = dados_bd[controle.artigo_sintese][controle.nome_leitor_sintese]
+    for chave in componentes.keys():
+        componentes[chave].current.value = dados_iniciais[chave]
+
     dados_finais = obter_dados_finais()
     if dados_finais != dados_iniciais:
         abrir_modal(e)
@@ -124,10 +132,6 @@ modal = ft.AlertDialog(
             ft.TextButton("Não", on_click=fechar_modal)
         ]
     )
-
-dados_iniciais = dados_bd[artigo][nome]
-for chave in componentes.keys():
-    componentes[chave].current.value = dados_iniciais[chave]
 
 def view():
     return ft.View(
