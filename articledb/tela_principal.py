@@ -3,6 +3,7 @@ import flet as ft
 import banco_de_dados as bd
 import validacoes as val
 import os
+from time import sleep
 
 IMAGEM_CAMINHO = os.path.join("articledb", "imagens", "header.png")
 
@@ -113,6 +114,7 @@ def deletar_artigo(e):
     atualizar_tabela(bd.obter_dados_tabela())
     limpar_pesquisa(e)
     fechar_modal_deletar_artigo(e)
+    atualizar_mensagem_feedback(f"O artigo '{artigo_removido[0]}' foi removido com sucesso.", ft.colors.RED)
     
 
 def editar_artigo(e):
@@ -147,21 +149,31 @@ def atualizar_tabela(lista_artigos:list):
     for id_linha, linha in enumerate(lista_artigos): #pegando cada linha do artigo recebido na funcao
         lista_colunas = [ #criando os 2 botoes (remover e editar) da linha final
             ft.DataCell(
-                ft.IconButton(
-                    icon=ft.Icons.DELETE, 
-                    icon_color="#1E3A8A",
-                    tooltip="Excluir", 
-                    key=id_linha, 
-                    on_click=abrir_modal_deletar_artigo
+                ft.Container(
+                    content=ft.IconButton(
+                        icon=ft.Icons.DELETE, 
+                        icon_color="#1E3A8A",
+                        tooltip="Excluir", 
+                        key=id_linha, 
+                        on_click=abrir_modal_deletar_artigo
+                    ),
+                    padding=.04,
+                    border=ft.border.all(1.1, "black"),
+                    border_radius=25,
                 )
             ),
             ft.DataCell(
-                ft.IconButton(
-                    icon=ft.Icons.EDIT, 
-                    icon_color="#1E3A8A",
-                    tooltip="Editar", 
-                    key=id_linha, 
-                    on_click=editar_artigo
+                ft.Container(
+                    content=ft.IconButton(
+                        icon=ft.Icons.EDIT, 
+                        icon_color="#1E3A8A",
+                        tooltip="Editar", 
+                        key=id_linha, 
+                        on_click=editar_artigo
+                    ),
+                    padding=.04,
+                    border=ft.border.all(1.1, "black"),
+                    border_radius=25,
                 )
             )
         ]
@@ -225,6 +237,20 @@ def fechar_modal_deletar_artigo(e):
     controle.pagina.close(modal_excluir_artigo)
     
 
+def atualizar_mensagem_feedback(msg:str, cor:ft.colors):
+    txt_mensagem_feedback.value = msg
+    container_mensagem_feedback.bgcolor = cor
+
+    if txt_mensagem_feedback.page: #atualizando o container se ele esta na pagina
+        container_mensagem_feedback.update()
+
+    #voltando a cor e texto ao original
+    sleep(10)
+    txt_mensagem_feedback.value = ""
+    container_mensagem_feedback.bgcolor = ft.colors.GREY
+    container_mensagem_feedback.update()
+
+
 modal_nome_leitor = ft.AlertDialog(
     modal=True,
     title=ft.Text("Digite o nome do leitor"),
@@ -251,8 +277,21 @@ modal_excluir_artigo = ft.AlertDialog(
     actions_alignment=ft.MainAxisAlignment.END
 )
 
+txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)
+
+container_mensagem_feedback = ft.Container(
+    content=txt_mensagem_feedback,
+    bgcolor=ft.colors.GREY,
+    width=2000,
+    expand=True,
+    border=ft.border.all(1.2, "black"),
+    border_radius=10,
+    alignment=ft.alignment.center,
+    height=25,
+)
+
 #criando as colunas iniciais dos leitores caso exista algum artigo no arquivo e caso exista algum leitor no arquivo
-if len(bd.obter_dados_tabela()) > 0:
+if bd.obter_dados_tabela():
     if len(bd.obter_dados_tabela()[0]) > 6:
         for id_coluna, coluna in enumerate(bd.obter_dados_tabela()[0][6:]):             #lista apenas dos nomes dos leitores
             tabela.columns.append(ft.DataColumn(ft.Text(f"Leitor {id_coluna + 1}")))    #criando as colunas
@@ -268,33 +307,44 @@ def view():
                 ft.Container(
                     content=ft.Column(
                         [
-                            ft.TextField(
-                                ref=componentes["tf_pesquisa"],
-                                label="Pesquisar",
-                                icon='search', 
-                                on_change=pesquisar_artigo,
-                                input_filter=ft.InputFilter(regex_string=r"^[a-zA-Z ]*$")
-                            ),
-                            ft.Row(
-                                [
-                                    ft.ElevatedButton(
-                                        text="Adicionar Artigo",
-                                        color="black",
-                                        bgcolor="white",
-                                        icon=ft.Icons.ADD,
-                                        icon_color="black",
-                                        on_click=lambda e: controle.pagina.go("2")
-                                    ),
-                                    ft.ElevatedButton(
-                                        text="Adicionar Leitor", 
-                                        color="black",
-                                        bgcolor="white",
-                                        icon=ft.Icons.ADD,
-                                        icon_color="black",
-                                        on_click=lambda e: controle.pagina.open(modal_nome_leitor)
-                                    )
-                                ],
-                                alignment=ft.MainAxisAlignment.CENTER
+                            ft.Container(
+                                content=ft.Column(
+                                    [
+                                        ft.Row(
+                                            [
+                                                ft.TextField(
+                                                    ref=componentes["tf_pesquisa"],
+                                                    label="Pesquisar",
+                                                    icon='search', 
+                                                    on_change=pesquisar_artigo,
+                                                    input_filter=ft.InputFilter(regex_string=r"^[a-zA-Z ]*$"),
+                                                    expand=True,
+                                                ),
+                                                ft.ElevatedButton(
+                                                    text="Adicionar Artigo",
+                                                    color="black",
+                                                    bgcolor="white",
+                                                    icon=ft.Icons.ADD,
+                                                    icon_color="black",
+                                                    on_click=lambda e: controle.pagina.go("2"),
+                                                ),
+                                                ft.ElevatedButton(
+                                                    text="Adicionar Leitor", 
+                                                    color="black",
+                                                    bgcolor="white",
+                                                    icon=ft.Icons.ADD,
+                                                    icon_color="black",
+                                                    on_click=lambda e: controle.pagina.open(modal_nome_leitor),
+                                                )
+                                            ]
+                                        ),
+                                        container_mensagem_feedback,
+                                    ],
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,  #centralizando o column pro texto ficar no meio certinho
+                                ),
+                                width=2000,
+                                border_radius=10,
+                                padding=0.4,
                             ),
                             ft.Container(
                                 content=ft.Row([tabela], scroll=ft.ScrollMode.ALWAYS),
@@ -315,4 +365,4 @@ def view():
             bgcolor=ft.colors.WHITE,
             padding=0,
     )
-        
+

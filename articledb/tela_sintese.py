@@ -70,6 +70,7 @@ def salvar_e_sair(e):
         dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
         bd.atualizar_dados_sintese(dados_bd)
         voltar(e)
+        tela_principal.atualizar_mensagem_feedback(f"A síntese do leitor '{tela_principal.leitor}' no artigo '{tela_principal.artigo}' foi modificada com sucesso.", ft.colors.BLUE)
 
 
 def atualizar_sintese(e):

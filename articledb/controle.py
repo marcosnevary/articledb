@@ -9,9 +9,9 @@ def init(p):
     
     telas = {
         "1": tela_principal.view(),
-        #"2": tela_cadastro.view(),
+        "2": tela_cadastro.view(),
         "3": tela_sintese.view(),
-        #"4": tela_edicao.view(),
+        "4": tela_edicao.view(),
     }
 
 
