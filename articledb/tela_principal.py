@@ -5,7 +5,7 @@ import validacoes as val
 import os
 from time import sleep
 
-IMAGEM_CAMINHO = os.path.join("articledb", "imagens", "header.png")
+CAMINHO_INICIO = os.path.join("articledb", "imagens", "inicio.png")
 
 componentes = {
         'tf_pesquisa': ft.Ref[ft.TextField](),
@@ -163,9 +163,9 @@ def atualizar_tabela(lista_artigos:list):
                         key=id_linha, 
                         on_click=abrir_modal_deletar_artigo
                     ),
-                    padding=.04,
-                    border=ft.border.all(1.1, "black"),
-                    border_radius=25,
+                    # padding=.04,
+                    # border=ft.border.all(1.1, "black"),
+                    # border_radius=25,
                 )
             ),
             ft.DataCell(
@@ -177,9 +177,9 @@ def atualizar_tabela(lista_artigos:list):
                         key=id_linha, 
                         on_click=editar_artigo
                     ),
-                    padding=.04,
-                    border=ft.border.all(1.1, "black"),
-                    border_radius=25,
+                    # padding=.04,
+                    # border=ft.border.all(1.1, "black"),
+                    # border_radius=25,
                 )
             )
         ]
@@ -196,7 +196,7 @@ def atualizar_tabela(lista_artigos:list):
                         ft.ElevatedButton(
                             text=coluna, 
                             color="#212121" if sintese_leitor == "" else "#FFFFFF",
-                            bgcolor="#FFFFFF" if sintese_leitor == "" else "#3254b4",
+                            bgcolor="#FFFFFF" if sintese_leitor == "" else "#3254B4",
                             on_click=abrir_sintese, 
                             key=id_linha
                         )
@@ -253,7 +253,7 @@ def atualizar_mensagem_feedback(msg:str, cor:ft.colors):
     #voltando a cor e texto ao original
     sleep(10)
     txt_mensagem_feedback.value = ""
-    container_mensagem_feedback.bgcolor = ft.colors.GREY
+    container_mensagem_feedback.bgcolor = ft.colors.WHITE
     container_mensagem_feedback.update()
 
 
@@ -264,21 +264,39 @@ modal_nome_leitor = ft.AlertDialog(
         label="Nome",
         ref=componentes['tf_novo_leitor'],
         on_change=mudar_cor_campo,
-        input_filter=ft.InputFilter(regex_string=r"^[a-zA-Z ]*$")
+        input_filter=ft.InputFilter(regex_string=r"^[a-zA-Z ]*$"),
+        border="underline"
     ),
     actions=[
-        ft.ElevatedButton("Cancelar", on_click=fechar_modal_leitor),
-        ft.ElevatedButton("Adicionar", on_click=adicionar_leitor),
+        ft.ElevatedButton(
+            "Cancelar",
+            on_click=fechar_modal_leitor,
+            icon="CLEAR",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=120
+        ),
+        ft.ElevatedButton(
+            "Adicionar",
+            on_click=adicionar_leitor,
+            icon="ADD",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=120
+        )
     ],
-    actions_alignment=ft.MainAxisAlignment.END
+    actions_alignment=ft.MainAxisAlignment.END,
+    bgcolor=ft.colors.WHITE
 )
 
 modal_excluir_artigo = ft.AlertDialog(
     modal=True,
     title=ft.Text("Você deseja excluir esse artigo?"),
     actions=[
-        ft.ElevatedButton("Não", on_click=fechar_modal_deletar_artigo),
         ft.ElevatedButton("Sim", on_click=deletar_artigo),
+        ft.ElevatedButton("Não", on_click=fechar_modal_deletar_artigo)
     ],
     actions_alignment=ft.MainAxisAlignment.END
 )
@@ -287,29 +305,29 @@ txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)
 
 container_mensagem_feedback = ft.Container(
     content=txt_mensagem_feedback,
-    bgcolor=ft.colors.GREY,
+    bgcolor=ft.colors.WHITE,
     width=2000,
     expand=True,
-    border=ft.border.all(1.2, "black"),
-    border_radius=10,
     alignment=ft.alignment.center,
     height=25,
+    border_radius=10
 )
 
 #criando as colunas iniciais dos leitores caso exista algum artigo no arquivo e caso exista algum leitor no arquivo
-if bd.obter_dados_tabela():
-    if len(bd.obter_dados_tabela()[0]) > 6:
-        for id_coluna, coluna in enumerate(bd.obter_dados_tabela()[0][6:]):             #lista apenas dos nomes dos leitores
+dados_tabela = bd.obter_dados_tabela()
+if dados_tabela:
+    if len(dados_tabela[0]) > 6:
+        for id_coluna, coluna in enumerate(dados_tabela[0][6:]):             #lista apenas dos nomes dos leitores
             tabela.columns.append(ft.DataColumn(ft.Text(f"Leitor {id_coluna + 1}")))    #criando as colunas
 
 #atualizando a tabela inicialmente
-atualizar_tabela(bd.obter_dados_tabela())
+atualizar_tabela(dados_tabela)
 
 def view():
     return ft.View(
             "Tela Principal",
             controls=[
-                ft.Image(src=IMAGEM_CAMINHO, width=1920, height=123, fit="COVER"),
+                ft.Image(src=CAMINHO_INICIO, width=1920, height=123, fit="COVER"),
                 ft.Container(
                     content=ft.Column(
                         [
@@ -325,24 +343,25 @@ def view():
                                                     on_change=pesquisar_artigo,
                                                     input_filter=ft.InputFilter(regex_string=r"^[a-zA-Z ]*$"),
                                                     expand=True,
+                                                    border="underline"
                                                 ),
                                                 ft.ElevatedButton(
                                                     text="Adicionar Artigo",
-                                                    color="black",
-                                                    bgcolor="white",
+                                                    color="white",
+                                                    bgcolor="#3254B4",
                                                     icon=ft.Icons.ADD,
-                                                    icon_color="black",
+                                                    icon_color="white",
                                                     on_click=lambda e: controle.pagina.go("2"),
                                                 ),
                                                 ft.ElevatedButton(
                                                     text="Adicionar Leitor", 
-                                                    color="black",
-                                                    bgcolor="white",
+                                                    color="white",
+                                                    bgcolor="#3254B4",
                                                     icon=ft.Icons.ADD,
-                                                    icon_color="black",
+                                                    icon_color="white",
                                                     on_click=lambda e: controle.pagina.open(modal_nome_leitor),
                                                 )
-                                            ]
+                                            ],
                                         ),
                                         container_mensagem_feedback,
                                     ],
@@ -371,4 +390,3 @@ def view():
             bgcolor=ft.colors.WHITE,
             padding=0,
     )
-

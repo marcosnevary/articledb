@@ -2,6 +2,9 @@ import flet as ft
 import controle
 import banco_de_dados as bd
 import tela_principal
+import os
+
+CAMINHO_SINTESE = os.path.join("articledb", "imagens", "sintese.png")
 
 dados_bd = bd.obter_dados_sintese()
 
@@ -70,7 +73,9 @@ def salvar_e_sair(e):
         dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
         bd.atualizar_dados_sintese(dados_bd)
         voltar(e)
-        tela_principal.atualizar_mensagem_feedback(f"A síntese do leitor '{tela_principal.leitor}' no artigo '{tela_principal.artigo}' foi modificada com sucesso.", ft.colors.BLUE)
+        tela_principal.atualizar_mensagem_feedback(
+            f'A síntese do leitor "{tela_principal.leitor}" no artigo "{tela_principal.artigo}" foi modificada com sucesso.', ft.colors.GREEN
+        )
 
 
 def atualizar_sintese(e):
@@ -92,14 +97,16 @@ artigo = ft.TextField(
     label="Artigo",
     disabled=True,
     value=" ",
-    width=largura
+    width=largura,
+    border="underline"
 )
 
 leitor = ft.TextField(
     label="Leitor",
     disabled=True,
     value=" ",
-    width=largura
+    width=largura,
+    border="underline"
 )
 
 objetivo = ft.Container(
@@ -108,7 +115,8 @@ objetivo = ft.Container(
         ref=componentes["objetivo"],
         width=largura,
         multiline=True,
-        on_change=mudar_cor_campo
+        on_change=mudar_cor_campo,
+        border="underline"
     )
 )
 
@@ -118,7 +126,8 @@ contribuicoes = ft.Container(
         ref=componentes["contribuicoes"],
         width=largura,
         multiline=True,
-        on_change=mudar_cor_campo
+        on_change=mudar_cor_campo,
+        border="underline"
     )
 )
 
@@ -128,7 +137,8 @@ lacunas = ft.Container(
         ref=componentes["lacunas"],
         width=largura,
         multiline=True,
-        on_change=mudar_cor_campo
+        on_change=mudar_cor_campo,
+        border="underline"
     )
 )
 
@@ -138,7 +148,8 @@ observacoes = ft.Container(
         ref=componentes["observacoes"],
         width=largura,
         multiline=True,
-        on_change=mudar_cor_campo
+        on_change=mudar_cor_campo,
+        border="underline"
     )
 )
 
@@ -164,14 +175,65 @@ def atualizar_sintese(e):
 def view():
     return ft.View(
         "Tela de Síntese",
-        [
-           artigo,
-           leitor,
-           objetivo,
-           contribuicoes,
-           lacunas,
-           observacoes,
-           ft.ElevatedButton("Sair", on_click=sair),
-           ft.ElevatedButton("Salvar e Sair", on_click=salvar_e_sair) 
-        ]
+        controls=[
+            ft.Image(src=CAMINHO_SINTESE, width=1920, height=123, fit="COVER"),
+            ft.Container(
+                content=ft.Column(
+                    [
+                        artigo,
+                        leitor,
+                        objetivo,
+                        contribuicoes,
+                        lacunas,
+                        observacoes,
+                        ft.Row(
+                            controls=[
+                                ft.ElevatedButton(
+                                    "Sair",
+                                    on_click=sair,
+                                    icon="ARROW_BACK",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=245
+                                ),
+                                ft.ElevatedButton(
+                                    "Salvar e Sair", 
+                                    on_click=salvar_e_sair, 
+                                    icon="SAVE",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=245
+                                )
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER
+                        )
+                    ],
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    expand=True
+                ),
+                alignment=ft.alignment.center,
+                expand=True,
+                padding=30
+            )
+        ],
+        padding=0,
+        bgcolor=ft.colors.WHITE,
     )
+
+
+# def view():
+#     return ft.View(
+#         "Tela de Síntese",
+#         [
+#            artigo,
+#            leitor,
+#            objetivo,
+#            contribuicoes,
+#            lacunas,
+#            observacoes,
+#            ft.ElevatedButton("Sair", on_click=sair),
+#            ft.ElevatedButton("Salvar e Sair", on_click=salvar_e_sair) 
+#         ]
+#     )
