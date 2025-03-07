@@ -103,7 +103,7 @@ def deletar_artigo(e):
     artigo_removido = lista_artigos.pop(id_linha)   #removendo o artigo baseado no indice da linha e salvando ele em uma variavel
 
     lista_artigos = [",".join(linha) for linha in lista_artigos] #criando a lista atualizada q vai ser enviada pro arquivo
-    
+
     bd.atualizar_dados_tabela(lista_artigos) #enviando pro arquivo
 
     dic_artigo_sintese = bd.obter_dados_sintese()       #carregando o dicionario do arquivo
@@ -114,6 +114,12 @@ def deletar_artigo(e):
     atualizar_tabela(bd.obter_dados_tabela())
     limpar_pesquisa(e)
     fechar_modal_deletar_artigo(e)
+
+    if not lista_artigos: #removendo as colunas de leitores se nao tem mais artigos e se tiver algum leitor
+        if len(tabela.columns) > 8:
+            tabela.columns = tabela.columns[:8]
+            tabela.update()
+
     atualizar_mensagem_feedback(f"O artigo '{artigo_removido[0]}' foi removido com sucesso.", ft.colors.RED)
     
 
