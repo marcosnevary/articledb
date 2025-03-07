@@ -221,19 +221,3 @@ def view():
         padding=0,
         bgcolor=ft.colors.WHITE,
     )
-
-
-# def view():
-#     return ft.View(
-#         "Tela de Síntese",
-#         [
-#            artigo,
-#            leitor,
-#            objetivo,
-#            contribuicoes,
-#            lacunas,
-#            observacoes,
-#            ft.ElevatedButton("Sair", on_click=sair),
-#            ft.ElevatedButton("Salvar e Sair", on_click=salvar_e_sair) 
-#         ]
-#     )

@@ -10,7 +10,7 @@ CAMINHO_INICIO = os.path.join("articledb", "imagens", "inicio.png")
 componentes = {
         'tf_pesquisa': ft.Ref[ft.TextField](),
         'tf_novo_leitor': ft.Ref[ft.TextField](),
-        'id_linha_deletar_artigo': "",
+        'id_linha_excluir_artigo': "",
     }
 
 tabela = ft.DataTable(
@@ -95,32 +95,32 @@ def adicionar_leitor(e:ft.ControlEvent):
         limpar_pesquisa(e)
 
 
-def deletar_artigo(e):
-    """Basicamente vai pegar a linha do artigo e abrir o modal de deletar"""
-    id_linha = int(componentes["id_linha_deletar_artigo"]) #pegando o id do artigo salvo nos componentes
+def excluir_artigo(e):
+    """Basicamente vai pegar a linha do artigo e abrir o modal de excluir"""
+    id_linha = int(componentes["id_linha_excluir_artigo"]) #pegando o id do artigo salvo nos componentes
     
-    lista_artigos = bd.obter_dados_tabela()         #lista de todos os artigos
-    artigo_removido = lista_artigos.pop(id_linha)   #removendo o artigo baseado no indice da linha e salvando ele em uma variavel
+    dados_tabela = bd.obter_dados_tabela()         #lista de todos os artigos
+    artigo_excluido = dados_tabela.pop(id_linha)   #removendo o artigo baseado no indice da linha e salvando ele em uma variavel
 
-    lista_artigos = [",".join(linha) for linha in lista_artigos] #criando a lista atualizada q vai ser enviada pro arquivo
+    dados_tabela = [",".join(linha) for linha in dados_tabela] #criando a lista atualizada q vai ser enviada pro arquivo
 
-    bd.atualizar_dados_tabela(lista_artigos) #enviando pro arquivo
+    bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
 
-    dic_artigo_sintese = bd.obter_dados_sintese()       #carregando o dicionario do arquivo
-    dic_artigo_sintese.pop(artigo_removido[0], None)    #removendo o dicionario do artigo, usando o nome (indice 0) salvo na variavel
+    dados_sintese = bd.obter_dados_sintese()       #carregando o dicionario do arquivo
+    dados_sintese.pop(artigo_excluido[0], None)    #removendo o dicionario do artigo, usando o nome (indice 0) salvo na variavel
 
-    bd.atualizar_dados_sintese(dic_artigo_sintese) #enviando pro arquivo
+    bd.atualizar_dados_sintese(dados_sintese) #enviando pro arquivo
 
     atualizar_tabela(bd.obter_dados_tabela())
     limpar_pesquisa(e)
-    fechar_modal_deletar_artigo(e)
+    fechar_modal_excluir(e)
 
-    if not lista_artigos: #removendo as colunas de leitores se nao tem mais artigos e se tiver algum leitor
+    if not dados_tabela: #removendo as colunas de leitores se nao tem mais artigos e se tiver algum leitor
         if len(tabela.columns) > 8:
             tabela.columns = tabela.columns[:8]
             tabela.update()
 
-    atualizar_mensagem_feedback(f"O artigo '{artigo_removido[0]}' foi removido com sucesso.", ft.colors.RED)
+    atualizar_mensagem_feedback(f"O artigo '{artigo_excluido[0]}' foi excluído com sucesso.", ft.colors.RED)
     
 
 def editar_artigo(e):
@@ -146,7 +146,7 @@ def abrir_sintese(e:ft.ControlEvent):
 
 def atualizar_tabela(lista_artigos:list):
     """
-    Essa funcao serve pra atualizar as linhas da tabela ao deletar/adicionar/pesquisar artigos
+    Essa funcao serve pra atualizar as linhas da tabela ao excluir/adicionar/pesquisar artigos
     ou ao adicionar uma sintese na tela de sintese
     """
 
@@ -161,11 +161,8 @@ def atualizar_tabela(lista_artigos:list):
                         icon_color="#1E3A8A",
                         tooltip="Excluir", 
                         key=id_linha, 
-                        on_click=abrir_modal_deletar_artigo
-                    ),
-                    # padding=.04,
-                    # border=ft.border.all(1.1, "black"),
-                    # border_radius=25,
+                        on_click=abrir_modal_excluir
+                    )
                 )
             ),
             ft.DataCell(
@@ -176,10 +173,7 @@ def atualizar_tabela(lista_artigos:list):
                         tooltip="Editar", 
                         key=id_linha, 
                         on_click=editar_artigo
-                    ),
-                    # padding=.04,
-                    # border=ft.border.all(1.1, "black"),
-                    # border_radius=25,
+                    )
                 )
             )
         ]
@@ -233,14 +227,14 @@ def fechar_modal_leitor(e):
     componentes["tf_novo_leitor"].current.value = ""  #resetando o valor do componente
 
 
-def abrir_modal_deletar_artigo(e:ft.ControlEvent):
-    componentes["id_linha_deletar_artigo"] = str(e.control.key) #salvando o id do artigo nos componentes
-    controle.pagina.open(modal_excluir_artigo)
+def abrir_modal_excluir(e:ft.ControlEvent):
+    componentes["id_linha_excluir_artigo"] = str(e.control.key) #salvando o id do artigo nos componentes
+    controle.pagina.open(modal_excluir)
 
 
-def fechar_modal_deletar_artigo(e):
-    componentes["id_linha_deletar_artigo"] = "" #resetando o valor do componente
-    controle.pagina.close(modal_excluir_artigo)
+def fechar_modal_excluir(e):
+    componentes["id_linha_excluir_artigo"] = "" #resetando o valor do componente
+    controle.pagina.close(modal_excluir)
     
 
 def atualizar_mensagem_feedback(msg:str, cor:ft.colors):
@@ -269,18 +263,18 @@ modal_nome_leitor = ft.AlertDialog(
     ),
     actions=[
         ft.ElevatedButton(
-            "Cancelar",
-            on_click=fechar_modal_leitor,
-            icon="CLEAR",
+            "Adicionar",
+            on_click=adicionar_leitor,
+            icon="ADD",
             color="white",
             bgcolor="#3254B4",
             icon_color="white",
             width=120
         ),
         ft.ElevatedButton(
-            "Adicionar",
-            on_click=adicionar_leitor,
-            icon="ADD",
+            "Cancelar",
+            on_click=fechar_modal_leitor,
+            icon="CLEAR",
             color="white",
             bgcolor="#3254B4",
             icon_color="white",
@@ -291,14 +285,31 @@ modal_nome_leitor = ft.AlertDialog(
     bgcolor=ft.colors.WHITE
 )
 
-modal_excluir_artigo = ft.AlertDialog(
+modal_excluir = ft.AlertDialog(
     modal=True,
     title=ft.Text("Você deseja excluir esse artigo?"),
     actions=[
-        ft.ElevatedButton("Sim", on_click=deletar_artigo),
-        ft.ElevatedButton("Não", on_click=fechar_modal_deletar_artigo)
+        ft.ElevatedButton(
+            "Sim",
+            on_click=excluir_artigo,
+            icon="CHECK",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=200
+        ),
+        ft.ElevatedButton(
+            "Não",
+            on_click=fechar_modal_excluir,
+            icon="CLEAR",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=200
+        )
     ],
-    actions_alignment=ft.MainAxisAlignment.END
+    actions_alignment=ft.MainAxisAlignment.END,
+    bgcolor=ft.colors.WHITE
 )
 
 txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)
