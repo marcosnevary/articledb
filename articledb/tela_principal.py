@@ -258,7 +258,7 @@ modal_nome_leitor = ft.AlertDialog(
         label="Nome",
         ref=componentes['tf_novo_leitor'],
         on_change=mudar_cor_campo,
-        input_filter=ft.InputFilter(regex_string=r"^[a-zA-Z ]*$"),
+        input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
         border="underline"
     ),
     actions=[
@@ -352,7 +352,6 @@ def view():
                                                     label="Pesquisar",
                                                     icon='search', 
                                                     on_change=pesquisar_artigo,
-                                                    input_filter=ft.InputFilter(regex_string=r"^[a-zA-Z ]*$"),
                                                     expand=True,
                                                     border="underline"
                                                 ),
