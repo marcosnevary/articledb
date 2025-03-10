@@ -60,7 +60,9 @@ def adicionar_leitor(e:ft.ControlEvent):
             tabela.rows[indice].cells.append(
                 ft.DataCell(
                     ft.ElevatedButton(
-                        text=nome_leitor, 
+                        text=nome_leitor,
+                        bgcolor="white",
+                        color="#212121",
                         on_click=abrir_sintese, 
                         key=indice
                     )
@@ -332,7 +334,7 @@ dados_tabela = bd.obter_dados_tabela()
 if dados_tabela:
     if len(dados_tabela[0]) > 6:
         for id_coluna, coluna in enumerate(dados_tabela[0][6:]):             #lista apenas dos nomes dos leitores
-            tabela.columns.append(ft.DataColumn(ft.Text(f"Leitor {id_coluna + 1}")))    #criando as colunas
+            tabela.columns.append(ft.DataColumn(ft.Text(f"Leitor {id_coluna + 1}", weight="bold")))    #criando as colunas
 
 #atualizando a tabela inicialmente
 atualizar_tabela(dados_tabela)
