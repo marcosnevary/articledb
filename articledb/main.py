@@ -7,7 +7,7 @@ def main(pagina: ft.Page):
     pagina.on_route_change = controle.controle_de_rota
     pagina.theme_mode  = "light"
     pagina.window.min_width = 750
-    pagina.window.min_height = 500
+    pagina.window.min_height = 700
     pagina.go('1')
 
 

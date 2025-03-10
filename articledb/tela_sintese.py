@@ -3,6 +3,7 @@ import controle
 import banco_de_dados as bd
 import tela_principal
 import os
+from time import sleep
 
 CAMINHO_SINTESE = os.path.join("articledb", "imagens", "sintese.png")
 
@@ -44,6 +45,8 @@ def voltar(e):
         componentes[chave].current.update()
     tela_principal.atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
+    mensagem_feedback.bgcolor = "white"
+    mensagem_feedback.content.value = ""
 
 
 def abrir_modal(e):
@@ -61,13 +64,27 @@ def obter_dados_finais():
     return dicionario
 
 
+def mudar_cor_mensagem(i):
+    mensagem_feedback.bgcolor = "red"
+    mensagem_feedback.content.value = "Campo(s) obrigatório(s) não preenchido(s)."
+    mensagem_feedback.update()
+    if i == 2:
+        sleep(10)
+        mensagem_feedback.bgcolor = "white"
+        mensagem_feedback.content.value = ""
+        if mensagem_feedback.page:
+            mensagem_feedback.update()
+
+
+
 def salvar_e_sair(e):
     permissao = True
-    for chave in list(componentes.keys())[:3]:
+    for i, chave in enumerate(list(componentes.keys())[:3]):
         if not componentes[chave].current.value.strip():
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
+            mudar_cor_mensagem(i)
     if permissao:
         dados_finais = obter_dados_finais()
         dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
@@ -156,11 +173,37 @@ observacoes = ft.Container(
 modal = ft.AlertDialog(
     modal=True,
     title=ft.Text("Confirmação"),
+    bgcolor="white",
     content=ft.Text("Você quer sair sem salvar as alterações?"),
     actions=[
-        ft.TextButton("Sim", on_click=voltar),
-        ft.TextButton("Não", on_click=fechar_modal)
+        ft.ElevatedButton(
+            "Sim",
+            icon="CHECK",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=200,
+            on_click=voltar
+        ),
+        ft.ElevatedButton(
+            "Não",
+            icon="CLEAR",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=200,
+            on_click=fechar_modal
+        )
     ]
+)
+
+mensagem_feedback = ft.Container(
+    content=ft.Text(value="", color="white"),
+    alignment=ft.alignment.center,
+    bgcolor="white", 
+    width=500,
+    height=25,
+    border_radius=10
 )
 
 def atualizar_sintese(e):
@@ -186,6 +229,7 @@ def view():
                         contribuicoes,
                         lacunas,
                         observacoes,
+                        mensagem_feedback,
                         ft.Row(
                             controls=[
                                 ft.ElevatedButton(
