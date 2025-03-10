@@ -45,7 +45,8 @@ def adicionar_leitor(e:ft.ControlEvent):
 
     if dados_tabela: #verifica se o leitor ja existe caso exista algum dado
         leitor_existe = nome_leitor in dados_tabela[0][6:]
-
+    else:
+        return
     if not nome_leitor.strip(): #nome digitado é vazio
         componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
         componentes["tf_novo_leitor"].current.update()
@@ -248,7 +249,9 @@ def atualizar_mensagem_feedback(msg:str, cor:ft.colors):
     sleep(10)
     txt_mensagem_feedback.value = ""
     container_mensagem_feedback.bgcolor = ft.colors.WHITE
-    container_mensagem_feedback.update()
+
+    if container_mensagem_feedback.page:
+        container_mensagem_feedback.update()
 
 
 modal_nome_leitor = ft.AlertDialog(
@@ -386,14 +389,15 @@ def view():
                                 border=ft.border.all(1.2, "black"),  # Adiciona borda fixa
                                 width=2000,
                                 border_radius=10,
-                                padding=0.4
+                                padding=0.4,
+                                margin=0
                             )
                         ]
                     ),
                     bgcolor=ft.colors.WHITE,
                     expand=True,
                     margin=-10,
-                    padding=ft.Padding(left=100, right=100, top=20, bottom=0),
+                    padding=ft.Padding(left=100, right=100, top=20, bottom=50),
                 )
             ],
             scroll=ft.ScrollMode.HIDDEN,

@@ -19,8 +19,6 @@ def obter_dados_tabela_lista():
 
     try:
         with open(CAMINHO_TABELA, mode="r") as arq:
-            print(arq.readlines())
-            print([linha.split("\n")[0].split(",") for linha in arq.readlines()])
             return [linha.split("\n")[0].split(",") for linha in arq.readlines()]
 
     except:
