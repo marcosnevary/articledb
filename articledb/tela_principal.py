@@ -72,14 +72,14 @@ def atualizar_tabela(lista_artigos):
                 lista_colunas.append(
                     ft.DataCell(
                         ft.Container(
-                            content = ft.ElevatedButton(
+                            ft.ElevatedButton(
                                 text=coluna, 
                                 color="#212121" if sintese_leitor == "" else "#FFFFFF",
                                 bgcolor="#FFFFFF" if sintese_leitor == "" else "#3254B4",
                                 on_click=abrir_sintese, 
                                 key=id_linha,
                             ),
-                            alignment=ft.alignment.center
+                            alignment=ft.alignment.center_right
                         )
                     )
                 )
@@ -128,19 +128,60 @@ def adicionar_leitor(e:ft.ControlEvent):
         componentes["tf_novo_leitor"].current.update()
         
     elif len(tabela.columns) < 18 and not leitor_existe: #nome nao e vazio, tem espaco pra mais leitores e o leitor ainda nao existe
-        tabela.columns.append(
-            ft.DataColumn(ft.Text(f"Leitor {len(tabela.columns) - 7}", weight="bold"))
-        ) #adicionando a coluna na tabela
+        tabela.columns.append( #adicionando a coluna nova na tabela
+            ft.DataColumn(
+                ft.Row(
+                    [
+                        ft.PopupMenuButton(
+                            icon= ft.Icons.MORE_VERT,
+                            items=
+                            [
+                                ft.PopupMenuItem(
+                                    content=ft.Row(
+                                        [
+                                            ft.Icon(
+                                                name=ft.Icons.DELETE, 
+                                                color="#1E3A8A", 
+                                                key=len(tabela.columns) - 8,
+                                            ),
+                                            ft.Text("Remover")
+                                        ]
+                                    ),
+                                    on_click=remover_leitor,
+                                ),
+                                ft.PopupMenuItem(
+                                    content=ft.Row(
+                                        [
+                                            ft.Icon(
+                                                name=ft.Icons.EDIT, 
+                                                color="#1E3A8A",
+                                                key=len(tabela.columns) - 8,
+                                            ),
+                                            ft.Text("Editar")
+                                        ]
+                                    ),
+                                    on_click=editar_leitor,
+                                )
+                            ]
+                        ),
+                        ft.Text(f"Leitor {len(tabela.columns) - 7}", weight="bold"),
+                    ]
+                )
+            )
+        )
         
         for indice, linha in enumerate(tabela.rows): #adicionando o botao de leitor em cada linha
             tabela.rows[indice].cells.append(
                 ft.DataCell(
-                    ft.ElevatedButton(
-                        text=nome_leitor,
-                        bgcolor="white",
-                        color="#212121",
-                        on_click=abrir_sintese, 
-                        key=indice
+                    ft.Container(
+                        ft.ElevatedButton(
+                            text=nome_leitor,
+                            bgcolor="white",
+                            color="#212121",
+                            on_click=abrir_sintese, 
+                            key=indice
+                        ),
+                        alignment=ft.alignment.center_right
                     )
                 )
             )
@@ -220,23 +261,23 @@ modal_leitor = ft.AlertDialog(
     bgcolor=ft.colors.WHITE
 )
 
+
 def atualizar_feedback(msg, cor):
     txt_mensagem_feedback.value = msg
     container_mensagem_feedback.bgcolor = cor
 
-    if txt_mensagem_feedback.page: #atualizando o container se ele esta na pagina
-        container_mensagem_feedback.update()
+    controle.pagina.update()
 
     #voltando a cor e texto ao original
     sleep(10)
     txt_mensagem_feedback.value = ""
     container_mensagem_feedback.bgcolor = "white"
 
-    if container_mensagem_feedback.page:
-        container_mensagem_feedback.update()
+    controle.pagina.update()
 
 
 txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)
+
 
 container_mensagem_feedback = ft.Container(
     content=txt_mensagem_feedback,
@@ -247,6 +288,7 @@ container_mensagem_feedback = ft.Container(
     height=25,
     border_radius=10
 )
+
 
 def excluir_artigo(e):
     """Basicamente vai pegar a linha do artigo e abrir o modal de excluir"""
@@ -313,6 +355,7 @@ modal_excluir = ft.AlertDialog(
     bgcolor=ft.colors.WHITE
 )
 
+
 def editar_artigo(e):
     """Vai abrir a tela de edicao de artigo, repassando pra ela o id do artigo"""
     global id_artigo
@@ -336,6 +379,19 @@ def abrir_sintese(e):
     controle.pagina.go("3")
 
 
+def remover_leitor(e):
+
+    print(e.control.content.controls[0].key)
+
+    pass
+
+
+def editar_leitor(e):
+    print(e.control.content.controls[0].key)
+
+    pass
+
+
 #criando as colunas iniciais dos leitores caso exista algum artigo no arquivo e caso exista algum leitor no arquivo
 dados_tabela = bd.obter_dados_tabela()
 if dados_tabela:
@@ -345,22 +401,39 @@ if dados_tabela:
                 ft.DataColumn(
                     ft.Row(
                         [
-                            ft.IconButton(
-                                icon=ft.Icons.DELETE, 
-                                icon_color="#1E3A8A", 
-                                tooltip="Excluir", 
-                                key=id_coluna, 
-                                on_click=lambda e: print(e.control.key)
+                            ft.PopupMenuButton(
+                                icon= ft.Icons.MORE_VERT,
+        	                    items=
+                                [
+                                    ft.PopupMenuItem(
+                                        content=ft.Row(
+                                            [
+                                                ft.Icon(
+                                                    name=ft.Icons.DELETE, 
+                                                    color="#1E3A8A", 
+                                                    key=id_coluna,
+                                                ),
+                                                ft.Text("Remover")
+                                            ]
+                                        ),
+                                        on_click=remover_leitor,
+                                    ),
+                                    ft.PopupMenuItem(
+                                        content=ft.Row(
+                                            [
+                                                ft.Icon(
+                                                    name=ft.Icons.EDIT, 
+                                                    color="#1E3A8A",
+                                                    key=id_coluna,
+                                                ),
+                                                ft.Text("Editar")
+                                            ]
+                                        ),
+                                        on_click=editar_leitor,
+                                    )
+                                ]
                             ),
                             ft.Text(f"Leitor {id_coluna + 1}", weight="bold"),
-                            ft.IconButton(
-                                icon=ft.Icons.EDIT, 
-                                icon_color="#1E3A8A",
-                                tooltip="Editar", 
-                                key=id_coluna,
-                                icon_size=20,
-                                on_click=lambda e: print(e.control.key),
-                            )
                         ]
                     )
                 )
