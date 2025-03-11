@@ -18,6 +18,8 @@ def init(p):
 def controle_de_rota(route_event):
     pagina.views.clear()    
     if pagina.route == "3":
+        global dados_bd
+        dados_bd = bd.obter_dados_sintese()
         tela_sintese.atualizar_sintese('')
     pagina.views.append(telas[route_event.route])        
     pagina.update()
