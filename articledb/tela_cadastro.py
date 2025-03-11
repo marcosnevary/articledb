@@ -99,7 +99,7 @@ def salvar_cadastro(e):
             }
         
         dados_tabela.append(artigo + leitores)
-        bd.atualizar_dados_tabela([",".join(linha) for linha in dados_tabela])
+        bd.atualizar_dados_tabela(["|".join(linha) for linha in dados_tabela])
         bd.atualizar_dados_sintese(dados_sintese)
 
         voltar(e)

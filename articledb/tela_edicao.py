@@ -72,7 +72,17 @@ def sair(e):
     if dados_iniciais != dados_finais:
         controle.pagina.open(modal_confirmacao)
     else:
-        controle.pagina.go("1")
+        voltar(e)
+
+
+def voltar(e):
+    for chave in componentes.keys():
+        componentes[chave].current.border_color = ft.colors.BLACK
+        componentes[chave].current.focused_border_color = "#3C618B"
+        componentes[chave].current.update()
+    tela_principal.atualizar_tabela(bd.obter_dados_tabela())
+    controle.pagina.go('1')
+    mudar_feedback("white", "")
 
 
 def salvar_edicao(e):
@@ -89,18 +99,21 @@ def salvar_edicao(e):
     if permissao:
         dados_finais = obter_dados_finais() + dados_iniciais[6:]
         dados_tabela = bd.obter_dados_tabela()
+
         dados_tabela[tela_principal.id_artigo] = dados_finais
+
         bd.atualizar_dados_tabela([','.join(linha) for linha in dados_tabela])
+
         titulo_antigo = dados_iniciais[0]
         titulo_novo = dados_finais[0]
         dados_sintese = bd.obter_dados_sintese()
+
         if dados_sintese and titulo_novo != titulo_antigo:
             dados_sintese[titulo_novo] = dados_sintese[titulo_antigo]
             del dados_sintese[titulo_antigo]
             bd.atualizar_dados_sintese(dados_sintese)
-        print(bd.obter_dados_tabela())
-        tela_principal.atualizar_tabela(bd.obter_dados_tabela())
-        controle.pagina.go("1")
+            
+        voltar(e)
     
 
 modal_confirmacao = ft.AlertDialog(
@@ -116,7 +129,7 @@ modal_confirmacao = ft.AlertDialog(
             bgcolor="#3254B4",
             icon_color="white",
             width=200,
-            on_click=lambda e: controle.pagina.go("1")
+            on_click=voltar
         ),
         ft.ElevatedButton(
             "Não",
@@ -125,7 +138,7 @@ modal_confirmacao = ft.AlertDialog(
             bgcolor="#3254B4",
             icon_color="white",
             width=200,
-            on_click=lambda e: controle.pagina.go("1")
+            on_click=lambda e: controle.pagina.close(modal_confirmacao)
         )
     ]
 )

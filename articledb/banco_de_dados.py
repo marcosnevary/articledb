@@ -8,7 +8,7 @@ def obter_dados_tabela():
 
     try:
         with open(CAMINHO_TABELA, mode="r") as arq:
-            return [linha.split("\n")[0].split(",") for linha in arq.readlines()]
+            return [linha.split("\n")[0].split("|") for linha in arq.readlines()]
 
     except:
         with open(CAMINHO_TABELA, mode="x") as arq:
@@ -19,7 +19,7 @@ def obter_dados_tabela_lista():
 
     try:
         with open(CAMINHO_TABELA, mode="r") as arq:
-            return [linha.split("\n")[0].split(",") for linha in arq.readlines()]
+            return [linha.split("\n")[0].split("|") for linha in arq.readlines()]
 
     except:
         with open(CAMINHO_TABELA, mode="x") as arq:
@@ -48,5 +48,3 @@ def atualizar_dados_sintese(dados_sintese:dict):
 
     with open(CAMINHO_SINTESE, mode="w") as arq:
         arq.write(str(dados_sintese))
-
-obter_dados_tabela_lista()
