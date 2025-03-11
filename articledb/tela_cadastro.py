@@ -3,7 +3,7 @@ import banco_de_dados as bd
 import controle
 from tela_principal import atualizar_tabela
 import os
-from utils import feedback, largura, mudar_cor_feedback_campos, criar_botao_sair, criar_botao_salvar
+from utils import largura
 from time import sleep
 
 CAMINHO_CADASTRO = os.path.join("articledb", "imagens", "cadastro.png")
@@ -26,6 +26,22 @@ componentes = {
     "abstracts": ft.Ref[ft.TextField]()
 }
 
+feedback = ft.Container(
+    content=ft.Text(value="", color="white"),
+    alignment=ft.alignment.center,
+    bgcolor="white", 
+    width=500,
+    height=25,
+    border_radius=10
+)
+
+def mudar_feedback(cor, msg):
+    feedback.bgcolor = cor
+    feedback.content.value = msg
+    if feedback.page:
+        feedback.update()
+    
+
 def mudar_cor_campo(e):
     for rotulo in rotulo_componente:
         if rotulo == e.control.label:
@@ -42,7 +58,9 @@ def voltar(e):
         componentes[chave].current.update()
     atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    mudar_cor_feedback_campos("white")
+    mudar_feedback("white", "")
+    for chave in componentes:
+        componentes[chave].current.value = ""
 
 
 def salvar_cadastro(e):
@@ -55,10 +73,10 @@ def salvar_cadastro(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            mudar_cor_feedback_campos("red")
+            mudar_feedback("red", "Campo(s) obrigatório(s) não preenchido(s).")
             if i == len(componentes) - 1:
                 sleep(10)
-                mudar_cor_feedback_campos("white")
+                mudar_feedback("white", "")
 
     if permissao:
         artigo = [campo.current.value for campo in componentes.values()]
@@ -107,8 +125,24 @@ def view():
                         feedback,
                         ft.Row(
                             controls=[
-                                criar_botao_sair(voltar),
-                                criar_botao_salvar(salvar_cadastro)
+                                ft.ElevatedButton(
+                                    "Sair",
+                                    on_click=voltar,
+                                    icon="CLEAR",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=245
+                                ),
+                                ft.ElevatedButton(
+                                    "Adicionar",
+                                    on_click=salvar_cadastro,
+                                    icon="ADD",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=245
+                                )
                             ],
                             alignment=ft.MainAxisAlignment.CENTER
                         )

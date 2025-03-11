@@ -198,6 +198,15 @@ modal_leitor = ft.AlertDialog(
     ),
     actions=[
         ft.ElevatedButton(
+            "Cancelar",
+            on_click=fechar_modal_leitor,
+            icon="CLEAR",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=120
+        ),
+        ft.ElevatedButton(
             "Adicionar",
             on_click=adicionar_leitor,
             icon="ADD",
@@ -206,15 +215,6 @@ modal_leitor = ft.AlertDialog(
             icon_color="white",
             width=120
         ),
-        ft.ElevatedButton(
-            "Cancelar",
-            on_click=fechar_modal_leitor,
-            icon="CLEAR",
-            color="white",
-            bgcolor="#3254B4",
-            icon_color="white",
-            width=120
-        )
     ],
     actions_alignment=ft.MainAxisAlignment.END,
     bgcolor=ft.colors.WHITE
@@ -315,7 +315,9 @@ modal_excluir = ft.AlertDialog(
 
 def editar_artigo(e):
     """Vai abrir a tela de edicao de artigo, repassando pra ela o id do artigo"""
-    controle.id_artigo_edicao = e.control.key
+    global id_artigo
+
+    id_artigo = e.control.key
 
     limpar_pesquisa(e)
 
