@@ -1,8 +1,22 @@
 import flet as ft
 import banco_de_dados as bd
 import controle
+from tela_principal import atualizar_tabela
+import os
+from utils import feedback, largura, mudar_cor_feedback_campos, criar_botao_sair, criar_botao_salvar
+from time import sleep
 
-# Os campos que estão fixados
+CAMINHO_CADASTRO = os.path.join("articledb", "imagens", "cadastro.png")
+
+rotulo_componente = {
+    "Título": "titulo",
+    "Link": "link",
+    "Autores": "autores",
+    "Ano": "ano",
+    "Local de Publicação": "local",
+    "Abstracts": "abstracts"
+}
+
 componentes = {
     "titulo": ft.Ref[ft.TextField](),
     "link": ft.Ref[ft.TextField](),
@@ -12,82 +26,99 @@ componentes = {
     "abstracts": ft.Ref[ft.TextField]()
 }
 
-def validar_campos():
-    """Vê se tá tudo preenchido pra continuar"""
-    for campo in componentes.values():
-        if not campo.current.value.strip():
-            campo.current.border_color = ft.colors.RED
-            campo.current.update()
-            return False
-    return True
+def mudar_cor_campo(e):
+    for rotulo in rotulo_componente:
+        if rotulo == e.control.label:
+            componente = rotulo_componente[rotulo]
+            componentes[componente].current.border_color = "black"
+            componentes[componente].current.focused_border_color = "#3C618B"
+            componentes[componente].current.update()
+
+
+def voltar(e):
+    for chave in componentes.keys():
+        componentes[chave].current.border_color = "black"
+        componentes[chave].current.focused_border_color = "#3C618B"
+        componentes[chave].current.update()
+    atualizar_tabela(bd.obter_dados_tabela())
+    controle.pagina.go('1')
+    mudar_cor_feedback_campos("white")
+
 
 def salvar_cadastro(e):
     """Guarda o artigo e prepara espaço pros leitores preencherem depois!"""
+    
+    permissao = True
 
-    if not validar_campos():
-        return  # Impede o salvamento setiver campos vazios
+    for i, chave in enumerate(componentes.keys()):
+        if not componentes[chave].current.value.strip():
+            componentes[chave].current.border_color = ft.colors.RED
+            componentes[chave].current.update()
+            permissao = False
+            mudar_cor_feedback_campos("red")
+            if i == len(componentes) - 1:
+                sleep(10)
+                mudar_cor_feedback_campos("white")
 
-    # Cria uma lista com os dados do artigo
-    artigo = [campo.current.value for campo in componentes.values()]
+    if permissao:
+        artigo = [campo.current.value for campo in componentes.values()]
 
-    # Carrega os dados já cadastrados
-    dados_tabela = bd.obter_dados_tabela()
-    dados_sintese = bd.obter_dados_sintese()
+        dados_tabela = bd.obter_dados_tabela()
+        dados_sintese = bd.obter_dados_sintese()
 
-    #Se o artigo ainda não tá cadastrado, reserva um espaço pra ele
-    titulo = artigo[0]  #A gente usa o titulo do artigo como chave
-    if titulo not in dados_sintese:
-        dados_sintese[titulo] = {}
+        titulo = artigo[0]
+        if titulo not in dados_sintese:
+            dados_sintese[titulo] = {}
 
-    # Identifica leitores na tabela
-    leitores = dados_tabela[0][6:] if dados_tabela and len(dados_tabela[0]) > 6 else []
+        leitores = dados_tabela[0][6:] if dados_tabela and len(dados_tabela[0]) > 6 else []
 
-    # Cria um dicionário para cada leitor
-    for leitor in leitores:
-        dados_sintese[titulo][leitor]= {
-            "objetivo": "",
-            "contribuicoes": "",
-            "lacunas": "",
-            "observacoes": ""
-        }
+        for leitor in leitores:
+            dados_sintese[titulo][leitor]= {
+                "objetivo": "",
+                "contribuicoes": "",
+                "lacunas": "",
+                "observacoes": ""
+            }
+        
+        dados_tabela.append(artigo + leitores)
+        bd.atualizar_dados_tabela([",".join(linha) for linha in dados_tabela])
+        bd.atualizar_dados_sintese(dados_sintese)
 
+        voltar(e)
 
-    # Atualiza os arquivos
-    dados_tabela.append(artigo)  # Adiciona o novo artigo
-    bd.atualizar_dados_tabela([",".join(linha) for linha in dados_tabela])
-    bd.atualizar_dados_sintese(dados_sintese)
-
-    # Voltar para a tela principal
-    controle.pagina.go("1")
 
 def view():
-    """Cria a tela de cadastro do artigo."""
     return ft.View(
-        "Cadastro de Artigo",
+        route="Tela de Cadastro",
         controls=[
+            ft.Image(src=CAMINHO_CADASTRO, width=1920, height=123, fit="COVER"),
             ft.Container(
                 content=ft.Column(
+                    controls=[
+                        ft.TextField(
+                            label=rotulo,
+                            ref=componentes[rotulo_componente[rotulo]],
+                            width=largura,
+                            on_change=mudar_cor_campo,
+                            border="underline"
+                        ) for rotulo in rotulo_componente
+                    ] +
                     [
-                        ft.Text("Cadastro de Artigo", size=24, weight=ft.FontWeight.BOLD)
-                    ] + [
-                        ft.TextField(label=label.capitalize(), ref=ref, width=400)
-                        for label, ref in componentes.items()
-                    ] + [
+                        feedback,
                         ft.Row(
-                            [
-                                ft.ElevatedButton(text="Salvar", on_click=salvar_cadastro),
-                                ft.ElevatedButton(text="Cancelar", on_click=lambda e: controle.pagina.go("1"))
+                            controls=[
+                                criar_botao_sair(voltar),
+                                criar_botao_salvar(salvar_cadastro)
                             ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            spacing=20
+                            alignment=ft.MainAxisAlignment.CENTER
                         )
                     ],
-                    spacing=10
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
                 ),
-                alignment=ft.alignment.center,
-                padding=20
+                padding=30
             )
         ],
+        padding=0,
         bgcolor=ft.colors.WHITE,
         scroll=ft.ScrollMode.AUTO
     )

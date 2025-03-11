@@ -18,5 +18,5 @@ def achar_nome_tela_principal(string:str, artigo:list)->list:
         texto = tratar_string(celula)
         if re.match(string, texto): #retornando true se der match
             return True
-
+    
     return False #retornando false se nada der match

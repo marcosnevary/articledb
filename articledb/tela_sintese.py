@@ -4,12 +4,16 @@ import banco_de_dados as bd
 import tela_principal
 import os
 from time import sleep
+from utils import feedback, largura, mudar_cor_feedback_campos, criar_botao_sair, criar_botao_salvar
 
 CAMINHO_SINTESE = os.path.join("articledb", "imagens", "sintese.png")
 
-dados_bd = bd.obter_dados_sintese()
-
-largura = 500
+rotulo_componente = {
+    "Objetivo": "objetivo",
+    "Contribuições": "contribuicoes",
+    "Lacunas Encontradas": "lacunas",
+    "Observações": "observacoes"
+}
 
 componentes = {
     "objetivo": ft.Ref[ft.TextField](),
@@ -19,23 +23,12 @@ componentes = {
 }
 
 def mudar_cor_campo(e):
-    campo = e.control.label
-    if campo == "Objetivo":
-        componentes["objetivo"].current.border_color = ft.colors.BLACK
-        componentes["objetivo"].current.focused_border_color = "#3C618B"
-        componentes["objetivo"].current.update()
-    if campo == "Principais Contribuições":
-        componentes["contribuicoes"].current.border_color = ft.colors.BLACK
-        componentes["contribuicoes"].current.focused_border_color = "#3C618B"
-        componentes["contribuicoes"].current.update()
-    if campo == "Lacunas Encontradas":
-        componentes["lacunas"].current.border_color = ft.colors.BLACK
-        componentes["lacunas"].current.focused_border_color = "#3C618B"
-        componentes["lacunas"].current.update()
-    if campo == "Outras Observações":
-        componentes["observacoes"].current.border_color = ft.colors.BLACK
-        componentes["observacoes"].current.focused_border_color = "#3C618B"
-        componentes["observacoes"].current.update()
+    for rotulo in rotulo_componente:
+        if rotulo == e.control.label:
+            componente = rotulo_componente[rotulo]
+            componentes[componente].current.border_color = "black"
+            componentes[componente].current.focused_border_color = "#3C618B"
+            componentes[componente].current.update()
 
 
 def voltar(e):
@@ -45,16 +38,7 @@ def voltar(e):
         componentes[chave].current.update()
     tela_principal.atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    mensagem_feedback.bgcolor = "white"
-    mensagem_feedback.content.value = ""
-
-
-def abrir_modal(e):
-    controle.pagina.open(modal)
-
-
-def fechar_modal(e):
-    controle.pagina.close(modal)
+    mudar_cor_feedback_campos("white")
 
 
 def obter_dados_finais():
@@ -64,53 +48,37 @@ def obter_dados_finais():
     return dicionario
 
 
-def mudar_cor_mensagem(i):
-    mensagem_feedback.bgcolor = "red"
-    mensagem_feedback.content.value = "Campo(s) obrigatório(s) não preenchido(s)."
-    mensagem_feedback.update()
-    if i == 2:
-        sleep(10)
-        mensagem_feedback.bgcolor = "white"
-        mensagem_feedback.content.value = ""
-        if mensagem_feedback.page:
-            mensagem_feedback.update()
-
-
-
-def salvar_e_sair(e):
+def salvar_sintese(e):
     permissao = True
     for i, chave in enumerate(list(componentes.keys())[:3]):
         if not componentes[chave].current.value.strip():
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            mudar_cor_mensagem(i)
+            mudar_cor_feedback_campos("red")
+            if i == len(componentes) - 1:
+                sleep(10)
+                mudar_cor_feedback_campos("white")
     if permissao:
         dados_finais = obter_dados_finais()
-        dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
-        bd.atualizar_dados_sintese(dados_bd)
+        controle.dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
+        bd.atualizar_dados_sintese(controle.dados_bd)
         voltar(e)
-        tela_principal.atualizar_mensagem_feedback(
-            f'A síntese do leitor "{tela_principal.leitor}" no artigo "{tela_principal.artigo}" foi modificada com sucesso.', ft.colors.GREEN
+        tela_principal.atualizar_feedback(
+            f'A síntese do leitor "{tela_principal.leitor}" no artigo "{tela_principal.artigo}" foi modificada com sucesso.',
+            "green"
         )
-
-
-def atualizar_sintese(e):
-    global dados_iniciais
-    dados_iniciais = dados_bd[tela_principal.artigo][tela_principal.leitor]
-    for chave in componentes.keys():
-        componentes[chave].current.value = dados_iniciais[chave]
 
 
 def sair(e):
     dados_finais = obter_dados_finais()
     if dados_finais != dados_iniciais:
-        abrir_modal(e)
+        controle.pagina.open(modal_confirmacao)
     else:
         voltar(e)
 
 
-artigo = ft.TextField(
+campo_artigo = ft.TextField(
     label="Artigo",
     disabled=True,
     value=" ",
@@ -118,7 +86,7 @@ artigo = ft.TextField(
     border="underline"
 )
 
-leitor = ft.TextField(
+campo_leitor = ft.TextField(
     label="Leitor",
     disabled=True,
     value=" ",
@@ -126,51 +94,20 @@ leitor = ft.TextField(
     border="underline"
 )
 
-objetivo = ft.Container(
-    content=ft.TextField(
-        label="Objetivo",
-        ref=componentes["objetivo"],
-        width=largura,
-        multiline=True,
-        on_change=mudar_cor_campo,
-        border="underline"
-    )
-)
+def atualizar_sintese(e):
+    global dados_iniciais
+    dados_iniciais = controle.dados_bd[tela_principal.artigo][tela_principal.leitor]
+    for chave in componentes.keys():
+        componentes[chave].current.value = dados_iniciais[chave]
+    campo_artigo.value = tela_principal.artigo
+    campo_leitor.value = tela_principal.leitor
 
-contribuicoes = ft.Container(
-     content=ft.TextField(
-        label="Principais Contribuições",
-        ref=componentes["contribuicoes"],
-        width=largura,
-        multiline=True,
-        on_change=mudar_cor_campo,
-        border="underline"
-    )
-)
 
-lacunas = ft.Container(
-     content=ft.TextField(
-        label="Lacunas Encontradas",
-        ref=componentes["lacunas"],
-        width=largura,
-        multiline=True,
-        on_change=mudar_cor_campo,
-        border="underline"
-    )
-)
+def fechar_modal(e):
+    controle.pagina.close(modal_confirmacao)
 
-observacoes = ft.Container(
-     content=ft.TextField(
-        label="Outras Observações",
-        ref=componentes["observacoes"],
-        width=largura,
-        multiline=True,
-        on_change=mudar_cor_campo,
-        border="underline"
-    )
-)
 
-modal = ft.AlertDialog(
+modal_confirmacao = ft.AlertDialog(
     modal=True,
     title=ft.Text("Confirmação"),
     bgcolor="white",
@@ -197,71 +134,43 @@ modal = ft.AlertDialog(
     ]
 )
 
-mensagem_feedback = ft.Container(
-    content=ft.Text(value="", color="white"),
-    alignment=ft.alignment.center,
-    bgcolor="white", 
-    width=500,
-    height=25,
-    border_radius=10
-)
-
-def atualizar_sintese(e):
-    global dados_iniciais
-    dados_iniciais = dados_bd[tela_principal.artigo][tela_principal.leitor]
-    for chave in componentes.keys():
-        componentes[chave].current.value = dados_iniciais[chave]
-    artigo.value = tela_principal.artigo
-    leitor.value = tela_principal.leitor
-
-
 def view():
     return ft.View(
-        "Tela de Síntese",
+        route="Tela de Síntese",
         controls=[
             ft.Image(src=CAMINHO_SINTESE, width=1920, height=123, fit="COVER"),
             ft.Container(
                 content=ft.Column(
+                    controls=[
+                        campo_artigo,
+                        campo_leitor
+                    ] +
                     [
-                        artigo,
-                        leitor,
-                        objetivo,
-                        contribuicoes,
-                        lacunas,
-                        observacoes,
-                        mensagem_feedback,
+                        ft.TextField(
+                            label=rotulo,
+                            ref=componentes[rotulo_componente[rotulo]],
+                            on_change=mudar_cor_campo,
+                            border="underline",
+                            width=largura,
+                            multiline=True
+                        ) for rotulo in rotulo_componente
+                    ] + 
+                    [
+                        feedback,
                         ft.Row(
                             controls=[
-                                ft.ElevatedButton(
-                                    "Sair",
-                                    on_click=sair,
-                                    icon="ARROW_BACK",
-                                    color="white",
-                                    bgcolor="#3254B4",
-                                    icon_color="white",
-                                    width=245
-                                ),
-                                ft.ElevatedButton(
-                                    "Salvar e Sair", 
-                                    on_click=salvar_e_sair, 
-                                    icon="SAVE",
-                                    color="white",
-                                    bgcolor="#3254B4",
-                                    icon_color="white",
-                                    width=245
-                                )
+                                criar_botao_sair(sair),
+                                criar_botao_salvar(salvar_sintese)
                             ],
                             alignment=ft.MainAxisAlignment.CENTER
                         )
                     ],
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    expand=True
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
                 ),
-                alignment=ft.alignment.center,
-                expand=True,
                 padding=30
             )
         ],
         padding=0,
         bgcolor=ft.colors.WHITE,
+        scroll=ft.ScrollMode.AUTO
     )

@@ -8,10 +8,10 @@ from time import sleep
 CAMINHO_INICIO = os.path.join("articledb", "imagens", "inicio.png")
 
 componentes = {
-        'tf_pesquisa': ft.Ref[ft.TextField](),
-        'tf_novo_leitor': ft.Ref[ft.TextField](),
-        'id_linha_excluir_artigo': "",
-    }
+    'tf_pesquisa': ft.Ref[ft.TextField](),
+    'tf_novo_leitor': ft.Ref[ft.TextField](),
+    'id_linha_excluir_artigo': "",
+}
 
 tabela = ft.DataTable(
     show_bottom_border=True,
@@ -26,6 +26,81 @@ tabela = ft.DataTable(
         ft.DataColumn(ft.Text("Abstracts", weight="bold"))
     ]
 )
+
+
+def atualizar_tabela(lista_artigos):
+    """
+    Essa funcao serve pra atualizar as linhas da tabela ao excluir/adicionar/pesquisar artigos
+    ou ao adicionar uma sintese na tela de sintese
+    """
+
+    tabela.rows = [] #limpando as linhas da tabela
+
+    for id_linha, linha in enumerate(lista_artigos): #pegando cada linha do artigo recebido na funcao
+        lista_colunas = [ #criando os 2 botoes (remover e editar) da linha final
+            ft.DataCell(
+                ft.Container(
+                    ft.IconButton(
+                        icon=ft.Icons.DELETE, 
+                        icon_color="#1E3A8A", 
+                        tooltip="Excluir", 
+                        key=id_linha, 
+                        on_click=abrir_modal_excluir
+                    )
+                )
+            ),
+            ft.DataCell(
+                ft.Container(
+                    ft.IconButton(
+                        icon=ft.Icons.EDIT, 
+                        icon_color="#1E3A8A",
+                        tooltip="Editar", 
+                        key=id_linha, 
+                        on_click=editar_artigo
+                    )
+                )
+            )
+        ]
+
+        for id_coluna, coluna in enumerate(linha): #pegando cada item da linha da lista recebida e adicionando na linha final
+            if id_coluna <= 5: #informacoes do artigo
+                lista_colunas.append(ft.DataCell(ft.Text(coluna)))
+            
+            else: #leitores
+                sintese_leitor = bd.obter_dados_sintese()[linha[0]][coluna]["objetivo"] #pegando a sintese do leitor, no caso apenas o objetivo (vai mudar a cor do botao)
+                
+                lista_colunas.append(
+                    ft.DataCell(
+                        ft.Container(
+                            content = ft.ElevatedButton(
+                                text=coluna, 
+                                color="#212121" if sintese_leitor == "" else "#FFFFFF",
+                                bgcolor="#FFFFFF" if sintese_leitor == "" else "#3254B4",
+                                on_click=abrir_sintese, 
+                                key=id_linha,
+                            ),
+                            alignment=ft.alignment.center
+                        )
+                    )
+                )
+
+        if len(lista_artigos) > 0: #adicionando a linha final na tabela se a lista recebida nao estiver vazia
+            tabela.rows.append(ft.DataRow(cells=lista_colunas))
+
+
+def pesquisar_artigo(e):
+    """Basicamente vai pesquisar os artigos"""
+    pesquisa = componentes['tf_pesquisa'].current.value #pegando o texto da pesquisa
+
+    atualizar_tabela( #atualizando a tabela com a lista de artigos que deram match com a pesquisa
+        [
+            artigo for artigo in bd.obter_dados_tabela() 
+            if val.achar_nome_tela_principal(pesquisa, artigo) #verifica se deu match
+        ]
+    )
+
+    tabela.update()
+
 
 def limpar_pesquisa(e):
     """Basicamente limpa a barra pesquisa"""
@@ -99,168 +174,19 @@ def adicionar_leitor(e:ft.ControlEvent):
         limpar_pesquisa(e)
 
 
-def excluir_artigo(e):
-    """Basicamente vai pegar a linha do artigo e abrir o modal de excluir"""
-    id_linha = int(componentes["id_linha_excluir_artigo"]) #pegando o id do artigo salvo nos componentes
-    
-    dados_tabela = bd.obter_dados_tabela()         #lista de todos os artigos
-    artigo_excluido = dados_tabela.pop(id_linha)   #removendo o artigo baseado no indice da linha e salvando ele em uma variavel
-
-    dados_tabela = [",".join(linha) for linha in dados_tabela] #criando a lista atualizada q vai ser enviada pro arquivo
-
-    bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
-
-    dados_sintese = bd.obter_dados_sintese()       #carregando o dicionario do arquivo
-    dados_sintese.pop(artigo_excluido[0], None)    #removendo o dicionario do artigo, usando o nome (indice 0) salvo na variavel
-
-    bd.atualizar_dados_sintese(dados_sintese) #enviando pro arquivo
-
-    atualizar_tabela(bd.obter_dados_tabela())
-    limpar_pesquisa(e)
-    fechar_modal_excluir(e)
-
-    if not dados_tabela: #removendo as colunas de leitores se nao tem mais artigos e se tiver algum leitor
-        if len(tabela.columns) > 8:
-            tabela.columns = tabela.columns[:8]
-            tabela.update()
-
-    atualizar_mensagem_feedback(f"O artigo '{artigo_excluido[0]}' foi excluído com sucesso.", ft.colors.RED)
-    
-
-def editar_artigo(e):
-    """Vai abrir a tela de edicao de artigo, repassando pra ela o id do artigo"""
-    controle.id_artigo_edicao = e.control.key
-
-    limpar_pesquisa(e)
-
-    controle.pagina.go("4")
-
-
-def abrir_sintese(e:ft.ControlEvent):
-    global leitor
-    global artigo
-    
-    leitor = e.control.text
-    artigo = bd.obter_dados_tabela()[e.control.key][0]
-
-    limpar_pesquisa(e)
-
-    controle.pagina.go("3")
-
-
-def atualizar_tabela(lista_artigos:list):
-    """
-    Essa funcao serve pra atualizar as linhas da tabela ao excluir/adicionar/pesquisar artigos
-    ou ao adicionar uma sintese na tela de sintese
-    """
-
-    tabela.rows = [] #limpando as linhas da tabela
-
-    for id_linha, linha in enumerate(lista_artigos): #pegando cada linha do artigo recebido na funcao
-        lista_colunas = [ #criando os 2 botoes (remover e editar) da linha final
-            ft.DataCell(
-                ft.Container(
-                    content=ft.IconButton(
-                        icon=ft.Icons.DELETE, 
-                        icon_color="#1E3A8A", 
-                        tooltip="Excluir", 
-                        key=id_linha, 
-                        on_click=abrir_modal_excluir
-                    )
-                )
-            ),
-            ft.DataCell(
-                ft.Container(
-                    content=ft.IconButton(
-                        icon=ft.Icons.EDIT, 
-                        icon_color="#1E3A8A",
-                        tooltip="Editar", 
-                        key=id_linha, 
-                        on_click=editar_artigo
-                    )
-                )
-            )
-        ]
-
-        for id_coluna, coluna in enumerate(linha): #pegando cada item da linha da lista recebida e adicionando na linha final
-            if id_coluna <= 5: #informacoes do artigo
-                lista_colunas.append(ft.DataCell(ft.Text(coluna)))
-            
-            else: #leitores
-                sintese_leitor = bd.obter_dados_sintese()[linha[0]][coluna]["objetivo"] #pegando a sintese do leitor, no caso apenas o objetivo (vai mudar a cor do botao)
-                
-                lista_colunas.append(
-                    ft.DataCell(
-                        ft.Container(
-                            content = ft.ElevatedButton(
-                                text=coluna, 
-                                color="#212121" if sintese_leitor == "" else "#FFFFFF",
-                                bgcolor="#FFFFFF" if sintese_leitor == "" else "#3254B4",
-                                on_click=abrir_sintese, 
-                                key=id_linha,
-                            ),
-                            alignment=ft.alignment.center
-                        )
-                    )
-                )
-
-        if len(lista_artigos) > 0: #adicionando a linha final na tabela se a lista recebida nao estiver vazia
-            tabela.rows.append(ft.DataRow(cells=lista_colunas))
-
-
-def pesquisar_artigo(e):
-    """Basicamente vai pesquisar os artigos"""
-    pesquisa = componentes['tf_pesquisa'].current.value #pegando o texto da pesquisa
-
-    atualizar_tabela( #atualizando a tabela com a lista de artigos que deram match com a pesquisa
-        [
-            artigo for artigo in bd.obter_dados_tabela() 
-            if val.achar_nome_tela_principal(pesquisa, artigo) #verifica se deu match
-        ]
-    )
-
-    tabela.update()
-
-
 def mudar_cor_campo(e):
     """Vai alterar a cor do campo de leitor"""
-    componentes["tf_novo_leitor"].current.border_color = ft.colors.BLACK
+    componentes["tf_novo_leitor"].current.border_color = "black"
     componentes["tf_novo_leitor"].current.focused_border_color = "#3C618B"
     componentes["tf_novo_leitor"].current.update()
 
 
 def fechar_modal_leitor(e):
-    controle.pagina.close(modal_nome_leitor)
+    controle.pagina.close(modal_leitor)
     componentes["tf_novo_leitor"].current.value = ""  #resetando o valor do componente
 
 
-def abrir_modal_excluir(e:ft.ControlEvent):
-    componentes["id_linha_excluir_artigo"] = str(e.control.key) #salvando o id do artigo nos componentes
-    controle.pagina.open(modal_excluir)
-
-
-def fechar_modal_excluir(e):
-    componentes["id_linha_excluir_artigo"] = "" #resetando o valor do componente
-    controle.pagina.close(modal_excluir)
-    
-
-def atualizar_mensagem_feedback(msg:str, cor:ft.colors):
-    txt_mensagem_feedback.value = msg
-    container_mensagem_feedback.bgcolor = cor
-
-    if txt_mensagem_feedback.page: #atualizando o container se ele esta na pagina
-        container_mensagem_feedback.update()
-
-    #voltando a cor e texto ao original
-    sleep(10)
-    txt_mensagem_feedback.value = ""
-    container_mensagem_feedback.bgcolor = ft.colors.WHITE
-
-    if container_mensagem_feedback.page:
-        container_mensagem_feedback.update()
-
-
-modal_nome_leitor = ft.AlertDialog(
+modal_leitor = ft.AlertDialog(
     modal=True,
     title=ft.Text("Digite o nome do leitor"),
     content=ft.TextField(
@@ -294,6 +220,72 @@ modal_nome_leitor = ft.AlertDialog(
     bgcolor=ft.colors.WHITE
 )
 
+def atualizar_feedback(msg, cor):
+    txt_mensagem_feedback.value = msg
+    container_mensagem_feedback.bgcolor = cor
+
+    if txt_mensagem_feedback.page: #atualizando o container se ele esta na pagina
+        container_mensagem_feedback.update()
+
+    #voltando a cor e texto ao original
+    sleep(10)
+    txt_mensagem_feedback.value = ""
+    container_mensagem_feedback.bgcolor = "white"
+
+    if container_mensagem_feedback.page:
+        container_mensagem_feedback.update()
+
+
+txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)
+
+container_mensagem_feedback = ft.Container(
+    content=txt_mensagem_feedback,
+    bgcolor=ft.colors.WHITE,
+    width=2000,
+    expand=True,
+    alignment=ft.alignment.center,
+    height=25,
+    border_radius=10
+)
+
+def excluir_artigo(e):
+    """Basicamente vai pegar a linha do artigo e abrir o modal de excluir"""
+    id_linha = int(componentes["id_linha_excluir_artigo"]) #pegando o id do artigo salvo nos componentes
+    
+    dados_tabela = bd.obter_dados_tabela()         #lista de todos os artigos
+    artigo_excluido = dados_tabela.pop(id_linha)   #removendo o artigo baseado no indice da linha e salvando ele em uma variavel
+
+    dados_tabela = [",".join(linha) for linha in dados_tabela] #criando a lista atualizada q vai ser enviada pro arquivo
+
+    bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
+
+    dados_sintese = bd.obter_dados_sintese()       #carregando o dicionario do arquivo
+    dados_sintese.pop(artigo_excluido[0], None)    #removendo o dicionario do artigo, usando o nome (indice 0) salvo na variavel
+
+    bd.atualizar_dados_sintese(dados_sintese) #enviando pro arquivo
+
+    atualizar_tabela(bd.obter_dados_tabela())
+    limpar_pesquisa(e)
+    fechar_modal_excluir(e)
+
+    if not dados_tabela: #removendo as colunas de leitores se nao tem mais artigos e se tiver algum leitor
+        if len(tabela.columns) > 8:
+            tabela.columns = tabela.columns[:8]
+            tabela.update()
+
+    atualizar_feedback(f"O artigo '{artigo_excluido[0]}' foi excluído com sucesso.", ft.colors.RED)
+    
+
+def abrir_modal_excluir(e):
+    componentes["id_linha_excluir_artigo"] = str(e.control.key) #salvando o id do artigo nos componentes
+    controle.pagina.open(modal_excluir)
+
+
+def fechar_modal_excluir(e):
+    componentes["id_linha_excluir_artigo"] = "" #resetando o valor do componente
+    controle.pagina.close(modal_excluir)
+
+
 modal_excluir = ft.AlertDialog(
     modal=True,
     title=ft.Text("Você deseja excluir esse artigo?"),
@@ -321,17 +313,26 @@ modal_excluir = ft.AlertDialog(
     bgcolor=ft.colors.WHITE
 )
 
-txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)
+def editar_artigo(e):
+    """Vai abrir a tela de edicao de artigo, repassando pra ela o id do artigo"""
+    controle.id_artigo_edicao = e.control.key
 
-container_mensagem_feedback = ft.Container(
-    content=txt_mensagem_feedback,
-    bgcolor=ft.colors.WHITE,
-    width=2000,
-    expand=True,
-    alignment=ft.alignment.center,
-    height=25,
-    border_radius=10
-)
+    limpar_pesquisa(e)
+
+    controle.pagina.go("4")
+
+
+def abrir_sintese(e):
+    global leitor
+    global artigo
+    
+    leitor = e.control.text
+    artigo = bd.obter_dados_tabela()[e.control.key][0]
+
+    limpar_pesquisa(e)
+
+    controle.pagina.go("3")
+
 
 #criando as colunas iniciais dos leitores caso exista algum artigo no arquivo e caso exista algum leitor no arquivo
 dados_tabela = bd.obter_dados_tabela()
@@ -361,7 +362,6 @@ if dados_tabela:
                         ]
                     )
                 )
-                
             )
 
 #atualizando a tabela inicialmente
@@ -369,68 +369,53 @@ atualizar_tabela(dados_tabela)
 
 def view():
     return ft.View(
-            "Tela Principal",
-            controls=[
-                ft.Image(src=CAMINHO_INICIO, width=1920, height=123, fit="COVER"),
-                ft.Container(
-                    content=ft.Column(
-                        [
-                            ft.Container(
-                                content=ft.Column(
-                                    [
-                                        ft.Row(
-                                            [
-                                                ft.TextField(
-                                                    ref=componentes["tf_pesquisa"],
-                                                    label="Pesquisar",
-                                                    icon='search', 
-                                                    on_change=pesquisar_artigo,
-                                                    expand=True,
-                                                    border="underline"
-                                                ),
-                                                ft.ElevatedButton(
-                                                    text="Adicionar Artigo",
-                                                    color="white",
-                                                    bgcolor="#3254B4",
-                                                    icon=ft.Icons.ADD,
-                                                    icon_color="white",
-                                                    on_click=lambda e: controle.pagina.go("2"),
-                                                ),
-                                                ft.ElevatedButton(
-                                                    text="Adicionar Leitor", 
-                                                    color="white",
-                                                    bgcolor="#3254B4",
-                                                    icon=ft.Icons.ADD,
-                                                    icon_color="white",
-                                                    on_click=lambda e: controle.pagina.open(modal_nome_leitor),
-                                                )
-                                            ],
-                                        ),
-                                        container_mensagem_feedback,
-                                    ],
-                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,  #centralizando o column pro texto ficar no meio certinho
+        route="Tela Principal",
+        controls=[
+            ft.Image(src=CAMINHO_INICIO, width=1920, height=123, fit="COVER"),
+            ft.Container(
+                content=ft.Column(
+                    [
+                        ft.Row(
+                            [
+                                ft.TextField(
+                                    ref=componentes["tf_pesquisa"],
+                                    label="Pesquisar",
+                                    icon='search', 
+                                    on_change=pesquisar_artigo,
+                                    expand=True,
+                                    border="underline"
                                 ),
-                                width=2000,
-                                border_radius=10,
-                                padding=0.4,
-                            ),
-                            ft.Container(
-                                content=ft.Row([tabela], scroll=ft.ScrollMode.ALWAYS),
-                                border=ft.border.all(1.2, "black"),  # Adiciona borda fixa
-                                width=2000,
-                                border_radius=10,
-                                padding=0.4,
-                                margin=0
-                            )
-                        ]
-                    ),
-                    bgcolor=ft.colors.WHITE,
-                    expand=True,
-                    margin=-10,
-                    padding=ft.Padding(left=100, right=100, top=20, bottom=50),
-                )
-            ],
-            scroll=ft.ScrollMode.HIDDEN,
-            bgcolor=ft.colors.WHITE,
-            padding=0,
+                                ft.ElevatedButton(
+                                    text="Adicionar Artigo",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon=ft.Icons.ADD,
+                                    icon_color="white",
+                                    on_click=lambda e: controle.pagina.go("2"),
+                                ),
+                                ft.ElevatedButton(
+                                    text="Adicionar Leitor", 
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon=ft.Icons.ADD,
+                                    icon_color="white",
+                                    on_click=lambda e: controle.pagina.open(modal_leitor),
+                                )
+                            ]
+                        ),
+                        container_mensagem_feedback,
+                        ft.Container(
+                            content=ft.Row([tabela], scroll=ft.ScrollMode.ALWAYS),
+                            border=ft.border.all(1.2, "black"),  # Adiciona borda fixa
+                            border_radius=10,
+                            padding=0.4,
+                        )
+                    ],
+                ),
+                padding=ft.Padding(left=100, top=30, bottom=30, right=100)
+            )
+        ],
+        scroll=ft.ScrollMode.HIDDEN,
+        bgcolor=ft.colors.WHITE,
+        padding=0,
     )
