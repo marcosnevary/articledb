@@ -61,7 +61,9 @@ def adicionar_leitor(e:ft.ControlEvent):
             tabela.rows[indice].cells.append(
                 ft.DataCell(
                     ft.ElevatedButton(
-                        text=nome_leitor, 
+                        text=nome_leitor,
+                        bgcolor="white",
+                        color="#212121",
                         on_click=abrir_sintese, 
                         key=indice
                     )
