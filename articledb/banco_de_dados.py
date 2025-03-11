@@ -39,7 +39,7 @@ def obter_dados_sintese():
         with open(CAMINHO_SINTESE, mode="r") as arq:
             return eval(arq.read())
     except:
-        with open(CAMINHO_SINTESE, mode="x") as arq:
+        with open(CAMINHO_SINTESE, mode="w") as arq:
             return {}
 
 
