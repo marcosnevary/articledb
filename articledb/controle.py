@@ -3,7 +3,7 @@ import flet as ft
 import banco_de_dados as bd
 
 def init(p):
-    global pagina, telas, banco_de_dados, id_artigo_edicao
+    global pagina, telas, banco_de_dados
     pagina = p
     id_artigo_edicao = None
     
@@ -20,6 +20,9 @@ def controle_de_rota(route_event):
     if pagina.route == "3":
         global dados_bd
         dados_bd = bd.obter_dados_sintese()
-        tela_sintese.atualizar_sintese('')
+        tela_sintese.atualizar_sintese()
+    if pagina.route == "4":
+        dados_bd = bd.obter_dados_tabela()
+        tela_edicao.atualizar_edicao()
     pagina.views.append(telas[route_event.route])        
     pagina.update()

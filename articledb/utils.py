@@ -1,30 +1,11 @@
 import flet as ft
+import controle
 
 largura = 500
 
-feedback = ft.Container(
-    content=ft.Text(value="", color="white"),
-    alignment=ft.alignment.center,
-    bgcolor="white", 
-    width=500,
-    height=25,
-    border_radius=10
-)
-
-def mudar_cor_feedback_campos(cor: str):
-    if cor == "white":
-        feedback.bgcolor = "white"
-        feedback.content.value = ""
-        feedback.update()
-    if cor == "red":
-        feedback.bgcolor = "red"
-        feedback.content.value = "Campo(s) obrigatório(s) não preenchido(s)."
-        feedback.update()
-
-
-def criar_botao_sair(funcao):
+def criar_botao_sair(funcao, texto):
     return ft.ElevatedButton(
-        "Sair",
+        text=texto,
         on_click=funcao,
         color="white",
         bgcolor="#3254B4",
@@ -34,9 +15,9 @@ def criar_botao_sair(funcao):
     )
 
 
-def criar_botao_salvar(funcao):
+def criar_botao_salvar(funcao, texto):
     return ft.ElevatedButton(
-        "Salvar e Sair", 
+        text=texto, 
         on_click=funcao, 
         color="white",
         bgcolor="#3254B4",
