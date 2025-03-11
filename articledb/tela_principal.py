@@ -47,6 +47,7 @@ def adicionar_leitor(e:ft.ControlEvent):
         leitor_existe = nome_leitor in dados_tabela[0][6:]
     else:
         return
+    
     if not nome_leitor.strip(): #nome digitado é vazio
         componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
         componentes["tf_novo_leitor"].current.update()
@@ -74,8 +75,8 @@ def adicionar_leitor(e:ft.ControlEvent):
             dados_tabela_atualizado.append(
                 ",".join(
                     [
-                        celula.content.value if type(celula.content) == ft.Text 
-                        else celula.content.text for celula in linha[2:]
+                        celula.content.value if type(celula.content) == ft.Text  #textos
+                        else celula.content.content.text for celula in linha[2:] #nome do leitor dentro do texto do botao, dentro do container, dentro do datacell
                     ]
                 )
             )
@@ -161,7 +162,7 @@ def atualizar_tabela(lista_artigos:list):
                 ft.Container(
                     content=ft.IconButton(
                         icon=ft.Icons.DELETE, 
-                        icon_color="#1E3A8A",
+                        icon_color="#1E3A8A", 
                         tooltip="Excluir", 
                         key=id_linha, 
                         on_click=abrir_modal_excluir
@@ -190,12 +191,15 @@ def atualizar_tabela(lista_artigos:list):
                 
                 lista_colunas.append(
                     ft.DataCell(
-                        ft.ElevatedButton(
-                            text=coluna, 
-                            color="#212121" if sintese_leitor == "" else "#FFFFFF",
-                            bgcolor="#FFFFFF" if sintese_leitor == "" else "#3254B4",
-                            on_click=abrir_sintese, 
-                            key=id_linha
+                        ft.Container(
+                            content = ft.ElevatedButton(
+                                text=coluna, 
+                                color="#212121" if sintese_leitor == "" else "#FFFFFF",
+                                bgcolor="#FFFFFF" if sintese_leitor == "" else "#3254B4",
+                                on_click=abrir_sintese, 
+                                key=id_linha,
+                            ),
+                            alignment=ft.alignment.center
                         )
                     )
                 )
@@ -333,8 +337,32 @@ container_mensagem_feedback = ft.Container(
 dados_tabela = bd.obter_dados_tabela()
 if dados_tabela:
     if len(dados_tabela[0]) > 6:
-        for id_coluna, coluna in enumerate(dados_tabela[0][6:]):             #lista apenas dos nomes dos leitores
-            tabela.columns.append(ft.DataColumn(ft.Text(f"Leitor {id_coluna + 1}", weight="bold")))    #criando as colunas
+        for id_coluna, coluna in enumerate(dados_tabela[0][6:]):   #lista apenas dos nomes dos leitores
+            tabela.columns.append(                                 #criando as colunas de leitores com os botoes de excluir e editar
+                ft.DataColumn(
+                    ft.Row(
+                        [
+                            ft.IconButton(
+                                icon=ft.Icons.DELETE, 
+                                icon_color="#1E3A8A", 
+                                tooltip="Excluir", 
+                                key=id_coluna, 
+                                on_click=lambda e: print(e.control.key)
+                            ),
+                            ft.Text(f"Leitor {id_coluna + 1}", weight="bold", weight="bold"),
+                            ft.IconButton(
+                                icon=ft.Icons.EDIT, 
+                                icon_color="#1E3A8A",
+                                tooltip="Editar", 
+                                key=id_coluna,
+                                icon_size=20,
+                                on_click=lambda e: print(e.control.key),
+                            )
+                        ]
+                    )
+                )
+                
+            )
 
 #atualizando a tabela inicialmente
 atualizar_tabela(dados_tabela)
