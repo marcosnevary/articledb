@@ -4,7 +4,7 @@ import banco_de_dados as bd
 import tela_principal
 import os
 from time import sleep
-from utils import feedback, largura, mudar_cor_feedback_campos, criar_botao_sair, criar_botao_salvar
+from utils import largura, criar_botao_sair, criar_botao_salvar
 
 CAMINHO_SINTESE = os.path.join("articledb", "imagens", "sintese.png")
 
@@ -22,6 +22,22 @@ componentes = {
     "observacoes": ft.Ref[ft.TextField]()
 }
 
+feedback = ft.Container(
+    content=ft.Text(value="", color="white"),
+    alignment=ft.alignment.center,
+    bgcolor="white", 
+    width=500,
+    height=25,
+    border_radius=10
+)
+
+def mudar_feedback(cor, msg):
+    feedback.bgcolor = cor
+    feedback.content.value = msg
+    if feedback.page:
+        feedback.update()
+
+
 def mudar_cor_campo(e):
     for rotulo in rotulo_componente:
         if rotulo == e.control.label:
@@ -38,12 +54,13 @@ def voltar(e):
         componentes[chave].current.update()
     tela_principal.atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    mudar_cor_feedback_campos("white")
+    mudar_feedback("white", "")
 
 
 def obter_dados_finais():
     dicionario = {}
     for chave in componentes.keys():
+        print(componentes[chave])
         dicionario[chave] = componentes[chave].current.value
     return dicionario
 
@@ -55,10 +72,10 @@ def salvar_sintese(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            mudar_cor_feedback_campos("red")
+            mudar_feedback("red", "Campo(s) obrigatório(s) não preenchido(s).")
             if i == len(componentes) - 1:
                 sleep(10)
-                mudar_cor_feedback_campos("white")
+                mudar_feedback("white", "")
     if permissao:
         dados_finais = obter_dados_finais()
         controle.dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
@@ -94,17 +111,13 @@ campo_leitor = ft.TextField(
     border="underline"
 )
 
-def atualizar_sintese(e):
+def atualizar_sintese():
     global dados_iniciais
     dados_iniciais = controle.dados_bd[tela_principal.artigo][tela_principal.leitor]
-    for chave in componentes.keys():
+    for chave in componentes:
         componentes[chave].current.value = dados_iniciais[chave]
     campo_artigo.value = tela_principal.artigo
     campo_leitor.value = tela_principal.leitor
-
-
-def fechar_modal(e):
-    controle.pagina.close(modal_confirmacao)
 
 
 modal_confirmacao = ft.AlertDialog(
@@ -129,7 +142,7 @@ modal_confirmacao = ft.AlertDialog(
             bgcolor="#3254B4",
             icon_color="white",
             width=200,
-            on_click=fechar_modal
+            on_click=lambda e: controle.pagina.close(modal_confirmacao)
         )
     ]
 )
@@ -159,8 +172,8 @@ def view():
                         feedback,
                         ft.Row(
                             controls=[
-                                criar_botao_sair(sair),
-                                criar_botao_salvar(salvar_sintese)
+                                criar_botao_sair(sair, "Sair"),
+                                criar_botao_salvar(salvar_sintese, "Salvar e Sair")
                             ],
                             alignment=ft.MainAxisAlignment.CENTER
                         )
