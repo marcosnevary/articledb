@@ -349,7 +349,7 @@ if dados_tabela:
                                 key=id_coluna, 
                                 on_click=lambda e: print(e.control.key)
                             ),
-                            ft.Text(f"Leitor {id_coluna + 1}", weight="bold", weight="bold"),
+                            ft.Text(f"Leitor {id_coluna + 1}", weight="bold"),
                             ft.IconButton(
                                 icon=ft.Icons.EDIT, 
                                 icon_color="#1E3A8A",
