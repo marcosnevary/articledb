@@ -10,6 +10,7 @@ CAMINHO_INICIO = os.path.join("articledb", "imagens", "inicio.png")
 componentes = {
     'tf_pesquisa': ft.Ref[ft.TextField](),
     'tf_novo_leitor': ft.Ref[ft.TextField](),
+    'tf_edita_leitor': ft.Ref[ft.TextField](),
     'id_linha_excluir_artigo': "",
 }
 
@@ -128,7 +129,7 @@ def adicionar_leitor(e:ft.ControlEvent):
         componentes["tf_novo_leitor"].current.update()
         
     elif len(tabela.columns) < 18 and not leitor_existe: #nome nao e vazio, tem espaco pra mais leitores e o leitor ainda nao existe
-        tabela.columns.append( #adicionando a coluna nova na tabela
+        tabela.columns.append( #adicionando a coluna nova na tabela com o botao
             ft.DataColumn(
                 ft.Row(
                     [
@@ -160,7 +161,7 @@ def adicionar_leitor(e:ft.ControlEvent):
                                             ft.Text("Editar")
                                         ]
                                     ),
-                                    on_click=editar_leitor,
+                                    on_click=abrir_edicao_leitor,
                                 )
                             ]
                         ),
@@ -169,37 +170,16 @@ def adicionar_leitor(e:ft.ControlEvent):
                 )
             )
         )
-        
-        for indice, linha in enumerate(tabela.rows): #adicionando o botao de leitor em cada linha
-            tabela.rows[indice].cells.append(
-                ft.DataCell(
-                    ft.Container(
-                        ft.ElevatedButton(
-                            text=nome_leitor,
-                            bgcolor="white",
-                            color="#212121",
-                            on_click=abrir_sintese, 
-                            key=indice
-                        ),
-                        alignment=ft.alignment.center_right
-                    )
-                )
-            )
 
-        dados_tabela_atualizado = [] #criando a lista atualizada que vai ser enviada pro arquivo
-        for linha in [row.cells for row in tabela.rows]:
-            dados_tabela_atualizado.append(
-                "|".join(
-                    [
-                        celula.content.value if type(celula.content) == ft.Text  #textos
-                        else celula.content.content.text for celula in linha[2:] #nome do leitor dentro do texto do botao, dentro do container, dentro do datacell
-                    ]
-                )
-            )
+        #atualizando o banco de dados da tabela e da sintese
+        for id_linha, linha in enumerate(dados_tabela): #tabela
+            dados_tabela[id_linha].append(nome_leitor)
+            dados_tabela[id_linha] = ",".join(linha)
 
-        bd.atualizar_dados_tabela(dados_tabela_atualizado) #enviando pro arquivo
+
+        bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
         
-        dados_sintese = bd.obter_dados_sintese() #criando o dicionario atualizado que vai ser enviado pro arquivo
+        dados_sintese = bd.obter_dados_sintese() #sintese
         for nome_artigo in dados_sintese:
             dados_sintese[nome_artigo][nome_leitor] = {
                 "objetivo": "",
@@ -210,21 +190,32 @@ def adicionar_leitor(e:ft.ControlEvent):
 
         bd.atualizar_dados_sintese(dados_sintese) #enviando pro arquivo
         
-        tabela.update() #atualizando a tabela
+        atualizar_tabela(bd.obter_dados_tabela()) #atualizando a tabela
+
         fechar_modal_leitor(e)
         limpar_pesquisa(e)
 
 
 def mudar_cor_campo(e):
     """Vai alterar a cor do campo de leitor"""
-    componentes["tf_novo_leitor"].current.border_color = "black"
-    componentes["tf_novo_leitor"].current.focused_border_color = "#3C618B"
-    componentes["tf_novo_leitor"].current.update()
+    if modal_leitor.page:
+        componentes["tf_novo_leitor"].current.border_color = "black"
+        componentes["tf_novo_leitor"].current.focused_border_color = "#3C618B"
+        componentes["tf_novo_leitor"].current.update()
+
+    if modal_edita_leitor.page:
+        componentes["tf_edita_leitor"].current.border_color = "black"
+        componentes["tf_edita_leitor"].current.focused_border_color = "#3C618B"
+        componentes["tf_edita_leitor"].current.update()
 
 
 def fechar_modal_leitor(e):
-    controle.pagina.close(modal_leitor)
-    componentes["tf_novo_leitor"].current.value = ""  #resetando o valor do componente
+    if modal_leitor.page: controle.pagina.close(modal_leitor)
+    if modal_edita_leitor.page: controle.pagina.close(modal_edita_leitor)
+
+    #resetando o valor dos componentes
+    componentes["tf_novo_leitor"].current.value = ""
+    componentes["tf_edita_leitor"].current.value = ""
 
 
 modal_leitor = ft.AlertDialog(
@@ -278,7 +269,6 @@ def atualizar_feedback(msg, cor):
 
 txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)
 
-
 container_mensagem_feedback = ft.Container(
     content=txt_mensagem_feedback,
     bgcolor=ft.colors.WHITE,
@@ -288,7 +278,6 @@ container_mensagem_feedback = ft.Container(
     height=25,
     border_radius=10
 )
-
 
 def excluir_artigo(e):
     """Basicamente vai pegar a linha do artigo e abrir o modal de excluir"""
@@ -380,16 +369,110 @@ def abrir_sintese(e):
 
 
 def remover_leitor(e):
+    dados_tabela = bd.obter_dados_tabela()
+    id_leitor = e.control.content.controls[0].key + 6
+    nome_leitor = dados_tabela[0][id_leitor]
 
-    print(e.control.content.controls[0].key)
+    #atualizando o banco de dados da tabela e da sintese
+    for id_linha, linha in enumerate(dados_tabela): #tabela
+        dados_tabela[id_linha].pop(id_leitor)
+        dados_tabela[id_linha] = ",".join(linha)
 
-    pass
+    bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
+
+    dados_sintese = bd.obter_dados_sintese()
+    for nome_artigo in dados_sintese:
+        dados_sintese[nome_artigo].pop(nome_leitor)
+
+    bd.atualizar_dados_sintese(dados_sintese)
+
+    #removendo a coluna e atualizando o key de cada coluna de leitor
+    tabela.columns.pop(id_leitor + 2)
+    for id_coluna, coluna in enumerate(tabela.columns[8:]):
+        coluna.label.controls[0].items[0].content.controls[0].key = id_coluna
+        coluna.label.controls[0].items[1].content.controls[0].key = id_coluna
+        coluna.label.controls[1].value = f"Leitor {id_coluna + 1}"
+
+    #atualizando a tabela
+    atualizar_tabela(bd.obter_dados_tabela())
+    tabela.update()
+
+
+def abrir_edicao_leitor(e):
+    modal_edita_leitor.actions[0].key = e.control.content.controls[0].key #passando o id pro modal de editar leitor
+    controle.pagina.open(modal_edita_leitor)
 
 
 def editar_leitor(e):
-    print(e.control.content.controls[0].key)
+    id_leitor = e.control.key
+    dados_tabela = bd.obter_dados_tabela()
+    nome_atual = dados_tabela[0][id_leitor + 6]              #nome atual do leitor
+    novo_nome = componentes['tf_edita_leitor'].current.value #novo nome do leitor
 
-    pass
+    if dados_tabela: #verifica se o leitor ja existe caso exista algum dado
+        leitor_existe = novo_nome in dados_tabela[0][6:]
+    else:
+        return
+    
+    if not novo_nome.strip(): #nome digitado é vazio
+        componentes["tf_edita_leitor"].current.border_color = ft.colors.RED
+        componentes["tf_edita_leitor"].current.update()
+
+
+    elif len(tabela.columns) < 18 and not leitor_existe: #nome nao e vazio, tem espaco pra mais leitores e o leitor ainda nao existe
+        #atualizando o banco de dados da tabela e da sintese
+        for id_linha, linha in enumerate(dados_tabela): #tabela
+            dados_tabela[id_linha][id_leitor + 6] = novo_nome
+            dados_tabela[id_linha] = ",".join(linha)
+
+        bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
+
+        dados_sintese = bd.obter_dados_sintese()
+        for artigo in dados_sintese: #sintese
+            dados_sintese[artigo][novo_nome] = dados_sintese[artigo].pop(nome_atual)
+
+        bd.atualizar_dados_sintese(dados_sintese) #enviando pro arquivo
+
+        #atualizando a tabela
+        atualizar_tabela(bd.obter_dados_tabela())
+
+        fechar_modal_leitor(e)
+        limpar_pesquisa(e)
+
+modal_edita_leitor = ft.AlertDialog(
+    modal=True,
+    title=ft.Text("Digite o novo nome do leitor"),
+    content=ft.TextField(
+        label="Nome",
+        ref=componentes["tf_edita_leitor"],
+        on_change=mudar_cor_campo,
+        input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
+        border="underline"
+    ),
+    actions=[
+        ft.ElevatedButton(
+            "Editar",
+            on_click=editar_leitor,
+            icon="ADD",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=120,
+            key = 0,
+        ),
+        ft.ElevatedButton(
+            "Cancelar",
+            on_click=fechar_modal_leitor,
+            icon="CLEAR",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=120
+        )
+    ],
+    actions_alignment=ft.MainAxisAlignment.END,
+    bgcolor=ft.colors.WHITE
+)
 
 
 #criando as colunas iniciais dos leitores caso exista algum artigo no arquivo e caso exista algum leitor no arquivo
@@ -429,7 +512,7 @@ if dados_tabela:
                                                 ft.Text("Editar")
                                             ]
                                         ),
-                                        on_click=editar_leitor,
+                                        on_click=abrir_edicao_leitor,
                                     )
                                 ]
                             ),
