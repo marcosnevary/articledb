@@ -174,7 +174,7 @@ def adicionar_leitor(e:ft.ControlEvent):
         #atualizando o banco de dados da tabela e da sintese
         for id_linha, linha in enumerate(dados_tabela): #tabela
             dados_tabela[id_linha].append(nome_leitor)
-            dados_tabela[id_linha] = ",".join(linha)
+            dados_tabela[id_linha] = "|".join(linha)
 
 
         bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
@@ -376,7 +376,7 @@ def remover_leitor(e):
     #atualizando o banco de dados da tabela e da sintese
     for id_linha, linha in enumerate(dados_tabela): #tabela
         dados_tabela[id_linha].pop(id_leitor)
-        dados_tabela[id_linha] = ",".join(linha)
+        dados_tabela[id_linha] = "|".join(linha)
 
     bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
 
@@ -423,7 +423,7 @@ def editar_leitor(e):
         #atualizando o banco de dados da tabela e da sintese
         for id_linha, linha in enumerate(dados_tabela): #tabela
             dados_tabela[id_linha][id_leitor + 6] = novo_nome
-            dados_tabela[id_linha] = ",".join(linha)
+            dados_tabela[id_linha] = "|".join(linha)
 
         bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
 

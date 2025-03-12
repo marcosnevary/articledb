@@ -102,7 +102,7 @@ def salvar_edicao(e):
 
         dados_tabela[tela_principal.id_artigo] = dados_finais
 
-        bd.atualizar_dados_tabela([','.join(linha) for linha in dados_tabela])
+        bd.atualizar_dados_tabela(["|".join(linha) for linha in dados_tabela])
 
         titulo_antigo = dados_iniciais[0]
         titulo_novo = dados_finais[0]
