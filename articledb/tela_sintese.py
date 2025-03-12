@@ -60,7 +60,6 @@ def voltar(e):
 def obter_dados_finais():
     dicionario = {}
     for chave in componentes.keys():
-        print(componentes[chave])
         dicionario[chave] = componentes[chave].current.value
     return dicionario
 
@@ -79,6 +78,7 @@ def salvar_sintese(e):
     if permissao:
         dados_finais = obter_dados_finais()
         controle.dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
+        print(dados_finais)
         bd.atualizar_dados_sintese(controle.dados_bd)
         voltar(e)
         tela_principal.atualizar_feedback(
