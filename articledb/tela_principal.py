@@ -125,6 +125,7 @@ def adicionar_leitor(e:ft.ControlEvent):
         return
     
     if not nome_leitor.strip(): #nome digitado é vazio
+        atualizar_feedback_leitor("red", "Digite um nome válido.")
         componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
         componentes["tf_novo_leitor"].current.update()
         
@@ -141,19 +142,6 @@ def adicionar_leitor(e:ft.ControlEvent):
                                     content=ft.Row(
                                         [
                                             ft.Icon(
-                                                name=ft.Icons.DELETE, 
-                                                color="#1E3A8A", 
-                                                key=len(tabela.columns) - 8,
-                                            ),
-                                            ft.Text("Remover")
-                                        ]
-                                    ),
-                                    on_click=remover_leitor,
-                                ),
-                                ft.PopupMenuItem(
-                                    content=ft.Row(
-                                        [
-                                            ft.Icon(
                                                 name=ft.Icons.EDIT, 
                                                 color="#1E3A8A",
                                                 key=len(tabela.columns) - 8,
@@ -162,6 +150,19 @@ def adicionar_leitor(e:ft.ControlEvent):
                                         ]
                                     ),
                                     on_click=abrir_edicao_leitor,
+                                ),
+                                ft.PopupMenuItem(
+                                    content=ft.Row(
+                                        [
+                                            ft.Icon(
+                                                name=ft.Icons.DELETE, 
+                                                color="#1E3A8A", 
+                                                key=len(tabela.columns) - 8,
+                                            ),
+                                            ft.Text("Remover")
+                                        ]
+                                    ),
+                                    on_click=remover_leitor,
                                 )
                             ]
                         ),
@@ -202,31 +203,57 @@ def mudar_cor_campo(e):
         componentes["tf_novo_leitor"].current.border_color = "black"
         componentes["tf_novo_leitor"].current.focused_border_color = "#3C618B"
         componentes["tf_novo_leitor"].current.update()
+        atualizar_feedback_leitor("white", "")
 
     if modal_edita_leitor.page:
         componentes["tf_edita_leitor"].current.border_color = "black"
         componentes["tf_edita_leitor"].current.focused_border_color = "#3C618B"
         componentes["tf_edita_leitor"].current.update()
+        atualizar_feedback_leitor("white", "")
 
 
 def fechar_modal_leitor(e):
-    if modal_leitor.page: controle.pagina.close(modal_leitor)
-    if modal_edita_leitor.page: controle.pagina.close(modal_edita_leitor)
+    if modal_leitor.page: 
+        controle.pagina.close(modal_leitor)
+    if modal_edita_leitor.page: 
+        controle.pagina.close(modal_edita_leitor)
 
     #resetando o valor dos componentes
     componentes["tf_novo_leitor"].current.value = ""
     componentes["tf_edita_leitor"].current.value = ""
+    atualizar_feedback_leitor("white", "")
+    mudar_cor_campo(e)
 
+def atualizar_feedback_leitor(cor, msg):
+    feedback_leitor.bgcolor = cor
+    feedback_leitor.content.value = msg
+    if feedback_leitor.page:
+        feedback_leitor.update()
+
+feedback_leitor = ft.Container(
+    content=ft.Text(value="", color="white"),
+    alignment=ft.alignment.center,
+    bgcolor="white", 
+    width=250,
+    height=25,
+    border_radius=10
+)
 
 modal_leitor = ft.AlertDialog(
     modal=True,
     title=ft.Text("Digite o nome do leitor"),
-    content=ft.TextField(
-        label="Nome",
-        ref=componentes['tf_novo_leitor'],
-        on_change=mudar_cor_campo,
-        input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
-        border="underline"
+    content=ft.Column(
+        [
+            ft.TextField(
+                label="Nome",
+                ref=componentes['tf_novo_leitor'],
+                on_change=mudar_cor_campo,
+                input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
+                border="underline"
+            ),
+            feedback_leitor
+        ],
+        height=70
     ),
     actions=[
         ft.ElevatedButton(
@@ -248,7 +275,6 @@ modal_leitor = ft.AlertDialog(
             width=120
         ),
     ],
-    actions_alignment=ft.MainAxisAlignment.END,
     bgcolor=ft.colors.WHITE
 )
 
@@ -348,23 +374,17 @@ modal_excluir = ft.AlertDialog(
 def editar_artigo(e):
     """Vai abrir a tela de edicao de artigo, repassando pra ela o id do artigo"""
     global id_artigo
-
     id_artigo = e.control.key
-
     limpar_pesquisa(e)
-
     controle.pagina.go("4")
 
 
 def abrir_sintese(e):
     global leitor
     global artigo
-    
     leitor = e.control.text
     artigo = bd.obter_dados_tabela()[e.control.key][0]
-
     limpar_pesquisa(e)
-
     controle.pagina.go("3")
 
 
@@ -417,7 +437,7 @@ def editar_leitor(e):
     if not novo_nome.strip(): #nome digitado é vazio
         componentes["tf_edita_leitor"].current.border_color = ft.colors.RED
         componentes["tf_edita_leitor"].current.update()
-
+        atualizar_feedback_leitor("red", "Digite um nome válido.")
 
     elif len(tabela.columns) < 18 and not leitor_existe: #nome nao e vazio, tem espaco pra mais leitores e o leitor ainda nao existe
         #atualizando o banco de dados da tabela e da sintese
@@ -441,15 +461,30 @@ def editar_leitor(e):
 
 modal_edita_leitor = ft.AlertDialog(
     modal=True,
-    title=ft.Text("Digite o novo nome do leitor"),
-    content=ft.TextField(
-        label="Nome",
-        ref=componentes["tf_edita_leitor"],
-        on_change=mudar_cor_campo,
-        input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
-        border="underline"
+    title=ft.Text("Digite o nome do leitor"),
+    content=ft.Column(
+        controls=[
+            ft.TextField(
+                label="Nome",
+                ref=componentes["tf_edita_leitor"],
+                on_change=mudar_cor_campo,
+                input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
+                border="underline"
+            ),
+            feedback_leitor
+        ],
+        height=70
     ),
     actions=[
+        ft.ElevatedButton(
+            "Cancelar",
+            on_click=fechar_modal_leitor,
+            icon="CLEAR",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=120
+        ),
         ft.ElevatedButton(
             "Editar",
             on_click=editar_leitor,
@@ -459,15 +494,6 @@ modal_edita_leitor = ft.AlertDialog(
             icon_color="white",
             width=120,
             key = 0,
-        ),
-        ft.ElevatedButton(
-            "Cancelar",
-            on_click=fechar_modal_leitor,
-            icon="CLEAR",
-            color="white",
-            bgcolor="#3254B4",
-            icon_color="white",
-            width=120
         )
     ],
     actions_alignment=ft.MainAxisAlignment.END,

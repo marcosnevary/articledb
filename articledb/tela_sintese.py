@@ -22,7 +22,7 @@ componentes = {
     "observacoes": ft.Ref[ft.TextField]()
 }
 
-feedback = ft.Container(
+feedback_sintese = ft.Container(
     content=ft.Text(value="", color="white"),
     alignment=ft.alignment.center,
     bgcolor="white", 
@@ -31,14 +31,14 @@ feedback = ft.Container(
     border_radius=10
 )
 
-def mudar_feedback(cor, msg):
-    feedback.bgcolor = cor
-    feedback.content.value = msg
-    if feedback.page:
-        feedback.update()
+def atualizar_feedback_sintese(cor, msg):
+    feedback_sintese.bgcolor = cor
+    feedback_sintese.content.value = msg
+    if feedback_sintese.page:
+        feedback_sintese.update()
 
 
-def mudar_cor_campo(e):
+def mudar_cor_campo_sintese(e):
     for rotulo in rotulo_componente:
         if rotulo == e.control.label:
             componente = rotulo_componente[rotulo]
@@ -54,7 +54,7 @@ def voltar(e):
         componentes[chave].current.update()
     tela_principal.atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    mudar_feedback("white", "")
+    atualizar_feedback_sintese("white", "")
 
 
 def obter_dados_finais():
@@ -71,10 +71,7 @@ def salvar_sintese(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            mudar_feedback("red", "Campo(s) obrigatório(s) não preenchido(s).")
-            if i == len(componentes) - 1:
-                sleep(10)
-                mudar_feedback("white", "")
+            atualizar_feedback_sintese("red", "Campo(s) obrigatório(s) não preenchido(s).")
     if permissao:
         dados_finais = obter_dados_finais()
         controle.dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
@@ -162,14 +159,14 @@ def view():
                         ft.TextField(
                             label=rotulo,
                             ref=componentes[rotulo_componente[rotulo]],
-                            on_change=mudar_cor_campo,
+                            on_change=mudar_cor_campo_sintese,
                             border="underline",
                             width=largura,
                             multiline=True
                         ) for rotulo in rotulo_componente
                     ] + 
                     [
-                        feedback,
+                        feedback_sintese,
                         ft.Row(
                             controls=[
                                 criar_botao_sair(sair, "Sair"),
