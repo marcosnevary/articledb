@@ -6,7 +6,6 @@ from tela_sintese import modal_confirmacao
 from tela_cadastro import mudar_cor_campo
 from utils import largura, criar_botao_sair, criar_botao_salvar
 import os
-from time import sleep
 
 CAMINHO_EDICAO = os.path.join("articledb", "imagens", "edicao.png")
 
@@ -55,7 +54,7 @@ def mudar_cor_campo(e):
 
 def atualizar_edicao():
     global dados_iniciais
-    dados_iniciais = controle.dados_bd[tela_principal.id_artigo]
+    dados_iniciais = controle.dados_edicao[tela_principal.id_artigo]
     for i, chave in enumerate(componentes):
         componentes[chave].current.value = dados_iniciais[i]
 
@@ -140,8 +139,15 @@ modal_confirmacao = ft.AlertDialog(
     ]
 )
 
+def obter_campo_leitores():
+    dados_tabela = bd.obter_dados_tabela()
+    if dados_tabela:
+        return dados_tabela[0][6:]
+    else:
+        return []
 
-def view():
+
+def view(existe_leitor: bool):
     return ft.View(
         route="Tela de Edição",
         controls=[
@@ -156,6 +162,14 @@ def view():
                             width=largura,
                             border="underline"
                         ) for rotulo in rotulo_componente
+                    ] + [
+                        ft.TextField(
+                            label=f"Leitor {i + 1}",
+                            value=leitor,
+                            disabled=True,
+                            width=500,
+                            border="underline"
+                        ) for i, leitor in enumerate(obter_campo_leitores()) if existe_leitor
                     ] +
                     [
                         feedback,

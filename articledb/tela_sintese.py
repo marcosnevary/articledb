@@ -3,7 +3,6 @@ import controle
 import banco_de_dados as bd
 import tela_principal
 import os
-from time import sleep
 from utils import largura, criar_botao_sair, criar_botao_salvar
 
 CAMINHO_SINTESE = os.path.join("articledb", "imagens", "sintese.png")
@@ -74,9 +73,9 @@ def salvar_sintese(e):
             atualizar_feedback_sintese("red", "Campo(s) obrigatório(s) não preenchido(s).")
     if permissao:
         dados_finais = obter_dados_finais()
-        controle.dados_bd[tela_principal.artigo][tela_principal.leitor] = dados_finais
+        controle.dados_sintese[tela_principal.artigo][tela_principal.leitor] = dados_finais
         print(dados_finais)
-        bd.atualizar_dados_sintese(controle.dados_bd)
+        bd.atualizar_dados_sintese(controle.dados_sintese)
         voltar(e)
         tela_principal.atualizar_feedback(
             f'A síntese do leitor "{tela_principal.leitor}" no artigo "{tela_principal.artigo}" foi modificada com sucesso.',
@@ -110,7 +109,7 @@ campo_leitor = ft.TextField(
 
 def atualizar_sintese():
     global dados_iniciais
-    dados_iniciais = controle.dados_bd[tela_principal.artigo][tela_principal.leitor]
+    dados_iniciais = controle.dados_sintese[tela_principal.artigo][tela_principal.leitor]
     for chave in componentes:
         componentes[chave].current.value = dados_iniciais[chave]
     campo_artigo.value = tela_principal.artigo
