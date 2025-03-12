@@ -93,9 +93,6 @@ def salvar_edicao(e):
             componentes[chave].current.update()
             permissao = False
             mudar_feedback("red", "Campo(s) obrigatório(s) não preenchido(s).")
-            if i == len(componentes) - 1:
-                sleep(10)
-                mudar_feedback("white", "")
     if permissao:
         dados_finais = obter_dados_finais() + dados_iniciais[6:]
         dados_tabela = bd.obter_dados_tabela()

@@ -35,7 +35,7 @@ feedback = ft.Container(
     border_radius=10
 )
 
-def mudar_feedback(cor, msg):
+def atualizar_feedback(cor, msg):
     feedback.bgcolor = cor
     feedback.content.value = msg
     if feedback.page:
@@ -58,7 +58,7 @@ def voltar(e):
         componentes[chave].current.update()
     atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    mudar_feedback("white", "")
+    atualizar_feedback("white", "")
     for chave in componentes:
         componentes[chave].current.value = ""
 
@@ -73,10 +73,7 @@ def salvar_cadastro(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            mudar_feedback("red", "Campo(s) obrigatório(s) não preenchido(s).")
-            if i == len(componentes) - 1:
-                sleep(10)
-                mudar_feedback("white", "")
+            atualizar_feedback("red", "Campo(s) obrigatório(s) não preenchido(s).")
 
     if permissao:
         artigo = [campo.current.value for campo in componentes.values()]
