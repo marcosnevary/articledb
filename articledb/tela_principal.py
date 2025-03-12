@@ -189,7 +189,7 @@ def adicionar_leitor(e:ft.ControlEvent):
         dados_tabela_atualizado = [] #criando a lista atualizada que vai ser enviada pro arquivo
         for linha in [row.cells for row in tabela.rows]:
             dados_tabela_atualizado.append(
-                ",".join(
+                "|".join(
                     [
                         celula.content.value if type(celula.content) == ft.Text  #textos
                         else celula.content.content.text for celula in linha[2:] #nome do leitor dentro do texto do botao, dentro do container, dentro do datacell
@@ -297,7 +297,7 @@ def excluir_artigo(e):
     dados_tabela = bd.obter_dados_tabela()         #lista de todos os artigos
     artigo_excluido = dados_tabela.pop(id_linha)   #removendo o artigo baseado no indice da linha e salvando ele em uma variavel
 
-    dados_tabela = [",".join(linha) for linha in dados_tabela] #criando a lista atualizada q vai ser enviada pro arquivo
+    dados_tabela = ["|".join(linha) for linha in dados_tabela] #criando a lista atualizada q vai ser enviada pro arquivo
 
     bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
 
@@ -449,7 +449,7 @@ def view():
             ft.Image(src=CAMINHO_INICIO, width=1920, height=123, fit="COVER"),
             ft.Container(
                 content=ft.Column(
-                    [
+                    controls=[
                         ft.Row(
                             [
                                 ft.TextField(
@@ -486,6 +486,7 @@ def view():
                             padding=0.4,
                         )
                     ],
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
                 ),
                 padding=ft.Padding(left=100, top=30, bottom=30, right=100)
             )
