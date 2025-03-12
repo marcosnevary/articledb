@@ -109,7 +109,7 @@ def limpar_pesquisa(e):
     controle.pagina.update()
 
 
-def adicionar_leitor(e:ft.ControlEvent):
+def adicionar_leitor(e):
     """
     Essa funcao vai adicionar uma nova coluna de leitor (no maximo 10) e 
     atualizar o banco de dados com o novo leitor
@@ -149,7 +149,7 @@ def adicionar_leitor(e:ft.ControlEvent):
                                             ft.Text("Editar")
                                         ]
                                     ),
-                                    on_click=abrir_edicao_leitor,
+                                    on_click=abrir_edicao_leitor
                                 ),
                                 ft.PopupMenuItem(
                                     content=ft.Row(
@@ -162,9 +162,10 @@ def adicionar_leitor(e:ft.ControlEvent):
                                             ft.Text("Remover")
                                         ]
                                     ),
-                                    on_click=remover_leitor,
+                                    on_click=remover_leitor
                                 )
-                            ]
+                            ],
+                            bgcolor="white"
                         ),
                         ft.Text(f"Leitor {len(tabela.columns) - 7}", weight="bold"),
                     ]
@@ -409,12 +410,14 @@ def remover_leitor(e):
     #removendo a coluna e atualizando o key de cada coluna de leitor
     tabela.columns.pop(id_leitor + 2)
     for id_coluna, coluna in enumerate(tabela.columns[8:]):
+        print(coluna.label.controls[0].items)
         coluna.label.controls[0].items[0].content.controls[0].key = id_coluna
         coluna.label.controls[0].items[1].content.controls[0].key = id_coluna
         coluna.label.controls[1].value = f"Leitor {id_coluna + 1}"
 
     #atualizando a tabela
     atualizar_tabela(bd.obter_dados_tabela())
+
     tabela.update()
 
 
@@ -540,7 +543,8 @@ if dados_tabela:
                                         ),
                                         on_click=abrir_edicao_leitor,
                                     )
-                                ]
+                                ],
+                                bgcolor="white"
                             ),
                             ft.Text(f"Leitor {id_coluna + 1}", weight="bold"),
                         ]

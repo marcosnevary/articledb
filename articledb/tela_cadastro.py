@@ -4,7 +4,6 @@ import controle
 from tela_principal import atualizar_tabela
 import os
 from utils import largura
-from time import sleep
 
 CAMINHO_CADASTRO = os.path.join("articledb", "imagens", "cadastro.png")
 
@@ -24,7 +23,7 @@ componentes = {
     "ano": ft.Ref[ft.TextField](),
     "local": ft.Ref[ft.TextField](),
     "abstracts": ft.Ref[ft.TextField]()
-}
+}    
 
 feedback = ft.Container(
     content=ft.Text(value="", color="white"),
@@ -85,8 +84,8 @@ def salvar_cadastro(e):
         if titulo not in dados_sintese:
             dados_sintese[titulo] = {}
 
+        dados_tabela = bd.obter_dados_tabela()
         leitores = dados_tabela[0][6:] if dados_tabela and len(dados_tabela[0]) > 6 else []
-
         for leitor in leitores:
             dados_sintese[titulo][leitor]= {
                 "objetivo": "",
@@ -101,8 +100,15 @@ def salvar_cadastro(e):
 
         voltar(e)
 
+def obter_campo_leitores():
+    dados_tabela = bd.obter_dados_tabela()
+    if dados_tabela:
+        return dados_tabela[0][6:]
+    else:
+        return []
 
-def view():
+
+def view(existe_leitor=False):
     return ft.View(
         route="Tela de Cadastro",
         controls=[
@@ -117,7 +123,15 @@ def view():
                             on_change=mudar_cor_campo,
                             border="underline"
                         ) for rotulo in rotulo_componente
-                    ] +
+                    ] + [
+                        ft.TextField(
+                            label=f"Leitor {i + 1}",
+                            value=leitor,
+                            disabled=True,
+                            width=500,
+                            border="underline"
+                        ) for i, leitor in enumerate(obter_campo_leitores()) if existe_leitor
+                    ] + 
                     [
                         feedback,
                         ft.Row(
