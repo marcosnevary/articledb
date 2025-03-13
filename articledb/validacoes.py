@@ -23,28 +23,34 @@ componente_filtro = {
 
 
 def validar_input(valor: str, campo: str) -> bool:
+    '''
+    #TODO docstring
+    #TODO mover os links dos comentários para o docstring
+    '''
+
     valor = str(valor).strip()
     campo = str(campo)
 
     match campo:
         case "Título":
             # Mínimo: 3. Escolha arbitrária.
-            # Máximo: 400. Escolha arbitrária.
+            # Máximo: 350. O maior título de artigo do mundo tem 345: http://gomerpedia.org/wiki/What_is_the_longest_journal_article_title_in_the_literature%3F
 
-            if not (3 <= len(valor) <= 400):
+            if not (3 <= len(valor) <= 350):
                 return False
 
         case "Link":
-            # Mínimo: 11. Menor URL válida: http://a.bc
+            # Mínimo: 11. Menor URL válida: "http://a.bc"
             # Máximo: 2000. Recomendação do Google: https://support.google.com/webmasters/thread/278099742?hl=en&msgid=278133107
             if not (11 <= len(valor) <= 2000):
                 return False
             
             padrao_link = ''.join(
                 (
-                    r"https?://",                           # Protocolo http:// ou https://
+                    r"https?://",                           # Protocolo http ou https
                     r"(?=[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-]+)",  # Deve haver pelo menos um ponto entre domínios
-                    r"(?!.*[\.\?\#&=%]$)",                  # Não pode terminar com caracteres especiais de URL
+                    r"(?!.*[\?\#&=%]$)",                    # Não pode terminar com certos caracteres na URL
+                    r".{4,}"                                # 4 caracteres ou mais no resto da URL
                 )
             )
 
@@ -53,14 +59,14 @@ def validar_input(valor: str, campo: str) -> bool:
 
 
         case "Autores":
-            # Mínimo: 5. Menor autor válido: A, B.
+            # Mínimo: 5. Menor autor válido: "A, B."
             # Máximo: 400. Escolha arbitrária
             if not (5 <= len(valor) <= 400):
                 return False
             
             autores = valor.split(';') if ';' in valor else [valor]
 
-            padrao_autores = r"[A-Z]+\s[A-Z]\." # 'SOBRENOME, N.' (N = Nome)
+            padrao_autores = r"[A-Z]+,\s[A-Z]\." # "SOBRENOME, N." (N = Nome)
 
             if not all(re.fullmatch(padrao_autores, autor) for autor in autores):
                 return False
@@ -74,11 +80,17 @@ def validar_input(valor: str, campo: str) -> bool:
             
 
         case "Local de Publicação":
-            pass
+            # Mínimo: 2. Referência: https://en.wikipedia.org/wiki/List_of_short_place_names#:~:text=Bo%2C%20a%20city%20in%20Sierra%20Leone
+            # Máximo: 22. Referência: https://en.wikipedia.org/wiki/List_of_long_place_names#:~:text=Parangaricutirimicuaro,Juan%2C%20and%20Parangaricutiro.
+            if not (2 <= len(valor) <= 22): 
+                return False
 
 
         case "Abstracts":
-            pass
+            # Mínimo: 1. Escolha arbitrária.
+            # Máximo: 2000. Escolha arbitrária.
+            if not (1 <= len(valor) <= 2000):
+                return False
 
 
 def tratar_string(string:str):
