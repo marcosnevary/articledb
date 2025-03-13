@@ -4,6 +4,7 @@ import controle
 import banco_de_dados as bd
 from tela_sintese import modal_confirmacao
 from tela_cadastro import mudar_cor_campo
+from tela_principal import atualizar_feedback
 from utils import largura, criar_botao_sair, criar_botao_salvar
 import os
 
@@ -108,7 +109,8 @@ def salvar_edicao(e):
             dados_sintese[titulo_novo] = dados_sintese[titulo_antigo]
             del dados_sintese[titulo_antigo]
             bd.atualizar_dados_sintese(dados_sintese)
-            
+        
+        atualizar_feedback(f"O artigo '{titulo_antigo}' foi editado com sucesso.", ft.colors.RED)
         voltar(e)
     
 

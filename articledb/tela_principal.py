@@ -118,6 +118,7 @@ def adicionar_leitor(e):
     nome_leitor = componentes["tf_novo_leitor"].current.value
 
     dados_tabela = bd.obter_dados_tabela()
+    leitores = dados_tabela[0][6:]
 
     if dados_tabela: #verifica se o leitor ja existe caso exista algum dado
         leitor_existe = nome_leitor in dados_tabela[0][6:]
@@ -128,7 +129,14 @@ def adicionar_leitor(e):
         atualizar_feedback_leitor("red", "Digite um nome válido.")
         componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
         componentes["tf_novo_leitor"].current.update()
-        
+    elif nome_leitor in leitores:
+        componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
+        componentes["tf_novo_leitor"].current.update()
+        atualizar_feedback_leitor("red", "Leitor já adicionado.")
+    elif len(tabela.columns) == 18:
+        componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
+        componentes["tf_novo_leitor"].current.update()
+        atualizar_feedback_leitor("red", "Quantidade máxima atingida.")
     elif len(tabela.columns) < 18 and not leitor_existe: #nome nao e vazio, tem espaco pra mais leitores e o leitor ainda nao existe
         tabela.columns.append( #adicionando a coluna nova na tabela com o botao
             ft.DataColumn(
@@ -216,7 +224,7 @@ def mudar_cor_campo(e):
 def fechar_modal_leitor(e):
     if modal_leitor.page: 
         controle.pagina.close(modal_leitor)
-    if modal_edita_leitor.page: 
+    if modal_edita_leitor.page:
         controle.pagina.close(modal_edita_leitor)
 
     #resetando o valor dos componentes
@@ -417,12 +425,12 @@ def remover_leitor(e):
 
     #atualizando a tabela
     atualizar_tabela(bd.obter_dados_tabela())
-
+    atualizar_feedback(f"O leitor '{nome_leitor}' foi excluído com sucesso.", ft.colors.RED)
     tabela.update()
 
 
 def abrir_edicao_leitor(e):
-    modal_edita_leitor.actions[0].key = e.control.content.controls[0].key #passando o id pro modal de editar leitor
+    modal_edita_leitor.actions[1].key = e.control.content.controls[0].key #passando o id pro modal de editar leitor
     controle.pagina.open(modal_edita_leitor)
 
 
@@ -441,9 +449,11 @@ def editar_leitor(e):
         componentes["tf_edita_leitor"].current.border_color = ft.colors.RED
         componentes["tf_edita_leitor"].current.update()
         atualizar_feedback_leitor("red", "Digite um nome válido.")
-
-    elif len(tabela.columns) < 18 and not leitor_existe: #nome nao e vazio, tem espaco pra mais leitores e o leitor ainda nao existe
-        #atualizando o banco de dados da tabela e da sintese
+    elif leitor_existe:
+        componentes["tf_edita_leitor"].current.border_color = ft.colors.RED
+        componentes["tf_edita_leitor"].current.update()
+        atualizar_feedback_leitor("red", "Leitor já adicionado.")
+    else:
         for id_linha, linha in enumerate(dados_tabela): #tabela
             dados_tabela[id_linha][id_leitor + 6] = novo_nome
             dados_tabela[id_linha] = "|".join(linha)
@@ -458,8 +468,8 @@ def editar_leitor(e):
 
         #atualizando a tabela
         atualizar_tabela(bd.obter_dados_tabela())
-
         fechar_modal_leitor(e)
+        atualizar_feedback(f'O leitor "{nome_atual}" foi renomeado para "{novo_nome}" com sucesso.', "green")
         limpar_pesquisa(e)
 
 modal_edita_leitor = ft.AlertDialog(
@@ -491,7 +501,7 @@ modal_edita_leitor = ft.AlertDialog(
         ft.ElevatedButton(
             "Editar",
             on_click=editar_leitor,
-            icon="ADD",
+            icon=ft.Icons.EDIT,
             color="white",
             bgcolor="#3254B4",
             icon_color="white",
@@ -509,6 +519,7 @@ dados_tabela = bd.obter_dados_tabela()
 if dados_tabela:
     if len(dados_tabela[0]) > 6:
         for id_coluna, coluna in enumerate(dados_tabela[0][6:]):   #lista apenas dos nomes dos leitores
+            print(id_coluna, coluna)
             tabela.columns.append(                                 #criando as colunas de leitores com os botoes de excluir e editar
                 ft.DataColumn(
                     ft.Row(
