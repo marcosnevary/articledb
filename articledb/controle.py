@@ -24,10 +24,12 @@ def controle_de_rota(route_event):
             telas["2"] = tela_cadastro.view(True)
         else:
             telas["2"] = tela_cadastro.view(False)
+            
     if pagina.route == "3":
         global dados_sintese
         dados_sintese = bd.obter_dados_sintese()
         tela_sintese.atualizar_sintese()
+
     if pagina.route == "4":
         global dados_edicao
         dados_edicao = bd.obter_dados_tabela()
@@ -36,5 +38,6 @@ def controle_de_rota(route_event):
         else:
             telas["4"] = tela_edicao.view(False)
         tela_edicao.atualizar_edicao()
+
     pagina.views.append(telas[route_event.route])  
     pagina.update()
