@@ -123,7 +123,8 @@ def view(existe_leitor=False):
                             on_change=mudar_cor_campo,
                             border="underline"
                         ) for rotulo in rotulo_componente
-                    ] + [
+                    ] + 
+                    [
                         ft.TextField(
                             label=f"Leitor {i + 1}",
                             value=leitor,

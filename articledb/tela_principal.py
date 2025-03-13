@@ -46,7 +46,7 @@ def atualizar_tabela(lista_artigos):
                         icon_color="#1E3A8A", 
                         tooltip="Excluir", 
                         key=id_linha, 
-                        on_click=abrir_modal_excluir
+                        on_click=abrir_modal_excluir_artigo
                     )
                 )
             ),
@@ -116,27 +116,33 @@ def adicionar_leitor(e):
     """
     
     nome_leitor = componentes["tf_novo_leitor"].current.value
-
     dados_tabela = bd.obter_dados_tabela()
-    leitores = dados_tabela[0][6:]
+    
 
     if dados_tabela: #verifica se o leitor ja existe caso exista algum dado
         leitor_existe = nome_leitor in dados_tabela[0][6:]
-    else:
+
+    else: #nao existe nenhum artigo
+        atualizar_feedback_leitor("red", "Não existe nenhum artigo.")
         return
     
+    leitores = dados_tabela[0][6:]
+
     if not nome_leitor.strip(): #nome digitado é vazio
         atualizar_feedback_leitor("red", "Digite um nome válido.")
         componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
         componentes["tf_novo_leitor"].current.update()
+        
     elif nome_leitor in leitores:
         componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
         componentes["tf_novo_leitor"].current.update()
         atualizar_feedback_leitor("red", "Leitor já adicionado.")
+
     elif len(tabela.columns) == 18:
         componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
         componentes["tf_novo_leitor"].current.update()
         atualizar_feedback_leitor("red", "Quantidade máxima atingida.")
+
     elif len(tabela.columns) < 18 and not leitor_existe: #nome nao e vazio, tem espaco pra mais leitores e o leitor ainda nao existe
         tabela.columns.append( #adicionando a coluna nova na tabela com o botao
             ft.DataColumn(
@@ -150,6 +156,19 @@ def adicionar_leitor(e):
                                     content=ft.Row(
                                         [
                                             ft.Icon(
+                                                name=ft.Icons.DELETE, 
+                                                color="#1E3A8A", 
+                                                key=len(tabela.columns) - 8,
+                                            ),
+                                            ft.Text("Remover")
+                                        ]
+                                    ),
+                                    on_click=abrir_modal_excluir_leitor
+                                ),
+                                ft.PopupMenuItem(
+                                    content=ft.Row(
+                                        [
+                                            ft.Icon(
                                                 name=ft.Icons.EDIT, 
                                                 color="#1E3A8A",
                                                 key=len(tabela.columns) - 8,
@@ -158,19 +177,6 @@ def adicionar_leitor(e):
                                         ]
                                     ),
                                     on_click=abrir_edicao_leitor
-                                ),
-                                ft.PopupMenuItem(
-                                    content=ft.Row(
-                                        [
-                                            ft.Icon(
-                                                name=ft.Icons.DELETE, 
-                                                color="#1E3A8A", 
-                                                key=len(tabela.columns) - 8,
-                                            ),
-                                            ft.Text("Remover")
-                                        ]
-                                    ),
-                                    on_click=remover_leitor
                                 )
                             ],
                             bgcolor="white"
@@ -186,7 +192,6 @@ def adicionar_leitor(e):
             dados_tabela[id_linha].append(nome_leitor)
             dados_tabela[id_linha] = "|".join(linha)
 
-
         bd.atualizar_dados_tabela(dados_tabela) #enviando pro arquivo
         
         dados_sintese = bd.obter_dados_sintese() #sintese
@@ -201,9 +206,10 @@ def adicionar_leitor(e):
         bd.atualizar_dados_sintese(dados_sintese) #enviando pro arquivo
         
         atualizar_tabela(bd.obter_dados_tabela()) #atualizando a tabela
-
         fechar_modal_leitor(e)
         limpar_pesquisa(e)
+
+        atualizar_feedback(f"O leitor '{nome_leitor}' foi adicionado com sucesso." , "green") #mensagem de feedback
 
 
 def mudar_cor_campo(e):
@@ -224,6 +230,7 @@ def mudar_cor_campo(e):
 def fechar_modal_leitor(e):
     if modal_leitor.page: 
         controle.pagina.close(modal_leitor)
+
     if modal_edita_leitor.page:
         controle.pagina.close(modal_edita_leitor)
 
@@ -233,11 +240,13 @@ def fechar_modal_leitor(e):
     atualizar_feedback_leitor("white", "")
     mudar_cor_campo(e)
 
+
 def atualizar_feedback_leitor(cor, msg):
     feedback_leitor.bgcolor = cor
     feedback_leitor.content.value = msg
     if feedback_leitor.page:
         feedback_leitor.update()
+
 
 feedback_leitor = ft.Container(
     content=ft.Text(value="", color="white"),
@@ -248,6 +257,7 @@ feedback_leitor = ft.Container(
     border_radius=10
 )
 
+
 modal_leitor = ft.AlertDialog(
     modal=True,
     title=ft.Text("Digite o nome do leitor"),
@@ -257,6 +267,7 @@ modal_leitor = ft.AlertDialog(
                 label="Nome",
                 ref=componentes['tf_novo_leitor'],
                 on_change=mudar_cor_campo,
+                on_submit=adicionar_leitor,
                 input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
                 border="underline"
             ),
@@ -304,6 +315,7 @@ def atualizar_feedback(msg, cor):
 
 txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)
 
+
 container_mensagem_feedback = ft.Container(
     content=txt_mensagem_feedback,
     bgcolor=ft.colors.WHITE,
@@ -313,6 +325,7 @@ container_mensagem_feedback = ft.Container(
     height=25,
     border_radius=10
 )
+
 
 def excluir_artigo(e):
     """Basicamente vai pegar a linha do artigo e abrir o modal de excluir"""
@@ -332,7 +345,7 @@ def excluir_artigo(e):
 
     atualizar_tabela(bd.obter_dados_tabela())
     limpar_pesquisa(e)
-    fechar_modal_excluir(e)
+    fechar_modal_excluir_artigo(e)
 
     if not dados_tabela: #removendo as colunas de leitores se nao tem mais artigos e se tiver algum leitor
         if len(tabela.columns) > 8:
@@ -342,17 +355,17 @@ def excluir_artigo(e):
     atualizar_feedback(f"O artigo '{artigo_excluido[0]}' foi excluído com sucesso.", ft.colors.RED)
     
 
-def abrir_modal_excluir(e):
+def abrir_modal_excluir_artigo(e):
     componentes["id_linha_excluir_artigo"] = str(e.control.key) #salvando o id do artigo nos componentes
-    controle.pagina.open(modal_excluir)
+    controle.pagina.open(modal_excluir_artigo)
 
 
-def fechar_modal_excluir(e):
+def fechar_modal_excluir_artigo(e):
     componentes["id_linha_excluir_artigo"] = "" #resetando o valor do componente
-    controle.pagina.close(modal_excluir)
+    controle.pagina.close(modal_excluir_artigo)
 
 
-modal_excluir = ft.AlertDialog(
+modal_excluir_artigo = ft.AlertDialog(
     modal=True,
     title=ft.Text("Você deseja excluir esse artigo?"),
     actions=[
@@ -367,7 +380,7 @@ modal_excluir = ft.AlertDialog(
         ),
         ft.ElevatedButton(
             "Não",
-            on_click=fechar_modal_excluir,
+            on_click=fechar_modal_excluir_artigo,
             icon="CLEAR",
             color="white",
             bgcolor="#3254B4",
@@ -399,9 +412,11 @@ def abrir_sintese(e):
 
 def remover_leitor(e):
     dados_tabela = bd.obter_dados_tabela()
-    id_leitor = e.control.content.controls[0].key + 6
+    id_leitor = e.control.key
     nome_leitor = dados_tabela[0][id_leitor]
 
+    controle.pagina.close(modal_excluir_leitor) #fechando o modal de confirmacao de excluir leitor
+    
     #atualizando o banco de dados da tabela e da sintese
     for id_linha, linha in enumerate(dados_tabela): #tabela
         dados_tabela[id_linha].pop(id_leitor)
@@ -418,7 +433,6 @@ def remover_leitor(e):
     #removendo a coluna e atualizando o key de cada coluna de leitor
     tabela.columns.pop(id_leitor + 2)
     for id_coluna, coluna in enumerate(tabela.columns[8:]):
-        print(coluna.label.controls[0].items)
         coluna.label.controls[0].items[0].content.controls[0].key = id_coluna
         coluna.label.controls[0].items[1].content.controls[0].key = id_coluna
         coluna.label.controls[1].value = f"Leitor {id_coluna + 1}"
@@ -426,7 +440,47 @@ def remover_leitor(e):
     #atualizando a tabela
     atualizar_tabela(bd.obter_dados_tabela())
     atualizar_feedback(f"O leitor '{nome_leitor}' foi excluído com sucesso.", ft.colors.RED)
+
     tabela.update()
+
+
+def abrir_modal_excluir_leitor(e):
+    dados_tabela = bd.obter_dados_tabela()
+    id_leitor = e.control.content.controls[0].key + 6
+    nome_leitor = dados_tabela[0][id_leitor]
+
+    modal_excluir_leitor.actions[0].key = id_leitor
+    modal_excluir_leitor.title.value = f"Você deseja excluir o leitor '{nome_leitor}'?"
+
+    controle.pagina.open(modal_excluir_leitor)
+
+
+modal_excluir_leitor = ft.AlertDialog(
+    modal=True,
+    title=ft.Text(""),
+    actions=[
+        ft.ElevatedButton(
+            "Sim",
+            on_click=remover_leitor,
+            icon="CHECK",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=200
+        ),
+        ft.ElevatedButton(
+            "Não",
+            on_click=lambda e: controle.pagina.close(modal_excluir_leitor),
+            icon="CLEAR",
+            color="white",
+            bgcolor="#3254B4",
+            icon_color="white",
+            width=200
+        )
+    ],
+    actions_alignment=ft.MainAxisAlignment.END,
+    bgcolor=ft.colors.WHITE
+)
 
 
 def abrir_edicao_leitor(e):
@@ -435,7 +489,7 @@ def abrir_edicao_leitor(e):
 
 
 def editar_leitor(e):
-    id_leitor = e.control.key
+    id_leitor = modal_edita_leitor.actions[1].key
     dados_tabela = bd.obter_dados_tabela()
     nome_atual = dados_tabela[0][id_leitor + 6]              #nome atual do leitor
     novo_nome = componentes['tf_edita_leitor'].current.value #novo nome do leitor
@@ -472,6 +526,7 @@ def editar_leitor(e):
         atualizar_feedback(f'O leitor "{nome_atual}" foi renomeado para "{novo_nome}" com sucesso.', "green")
         limpar_pesquisa(e)
 
+
 modal_edita_leitor = ft.AlertDialog(
     modal=True,
     title=ft.Text("Digite o nome do leitor"),
@@ -482,7 +537,8 @@ modal_edita_leitor = ft.AlertDialog(
                 ref=componentes["tf_edita_leitor"],
                 on_change=mudar_cor_campo,
                 input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
-                border="underline"
+                border="underline",
+                on_submit=editar_leitor
             ),
             feedback_leitor
         ],
@@ -506,7 +562,7 @@ modal_edita_leitor = ft.AlertDialog(
             bgcolor="#3254B4",
             icon_color="white",
             width=120,
-            key = 0,
+            key = None,
         )
     ],
     actions_alignment=ft.MainAxisAlignment.END,
@@ -519,7 +575,6 @@ dados_tabela = bd.obter_dados_tabela()
 if dados_tabela:
     if len(dados_tabela[0]) > 6:
         for id_coluna, coluna in enumerate(dados_tabela[0][6:]):   #lista apenas dos nomes dos leitores
-            print(id_coluna, coluna)
             tabela.columns.append(                                 #criando as colunas de leitores com os botoes de excluir e editar
                 ft.DataColumn(
                     ft.Row(
@@ -539,7 +594,7 @@ if dados_tabela:
                                                 ft.Text("Remover")
                                             ]
                                         ),
-                                        on_click=remover_leitor,
+                                        on_click=abrir_modal_excluir_leitor,
                                     ),
                                     ft.PopupMenuItem(
                                         content=ft.Row(
