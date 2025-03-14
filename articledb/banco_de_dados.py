@@ -1,7 +1,7 @@
 import os
 
-CAMINHO_TABELA = os.path.join("articledb", "dados", "dados_tabela.txt")
-CAMINHO_SINTESE = os.path.join("articledb", "dados", "dados_sintese.txt")
+CAMINHO_TABELA = os.path.join("dados", "dados_tabela.txt")
+CAMINHO_SINTESE = os.path.join("dados", "dados_sintese.txt")
 
 def obter_dados_tabela():
     """Obtem os dados da tabela da tela principal."""

@@ -1,14 +1,14 @@
 import flet as ft
-import tela_principal
-import controle
-import banco_de_dados as bd
-from tela_sintese import modal_confirmacao
-from tela_cadastro import mudar_cor_campo
-from tela_principal import atualizar_feedback
-from utils import largura, criar_botao_sair, criar_botao_salvar
+from articledb import tela_principal
+from articledb import controle
+from articledb import banco_de_dados as bd
+from articledb.tela_sintese import modal_confirmacao
+from articledb.tela_cadastro import mudar_cor_campo
+from articledb.tela_principal import atualizar_feedback
+from articledb.utils import largura, criar_botao_sair, criar_botao_salvar
 import os
 
-CAMINHO_EDICAO = os.path.join("articledb", "imagens", "edicao.png")
+CAMINHO_EDICAO = os.path.join("imagens", "edicao.png")
 
 rotulo_componente = {
     "Título": "titulo",

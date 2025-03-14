@@ -1,11 +1,11 @@
 import flet as ft
-import controle
-import banco_de_dados as bd
-import tela_principal
+from articledb import controle
+from articledb import banco_de_dados as bd
+from articledb import tela_principal
 import os
-from utils import largura, criar_botao_sair, criar_botao_salvar
+from articledb.utils import largura, criar_botao_sair, criar_botao_salvar
 
-CAMINHO_SINTESE = os.path.join("articledb", "imagens", "sintese.png")
+CAMINHO_SINTESE = os.path.join("imagens", "sintese.png")
 
 rotulo_componente = {
     "Objetivo": "objetivo",

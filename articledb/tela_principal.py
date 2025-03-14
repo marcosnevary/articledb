@@ -1,11 +1,11 @@
-import controle
+from articledb import controle
 import flet as ft
-import banco_de_dados as bd
-import validacoes as val
+from articledb import banco_de_dados as bd
+from articledb import validacoes as val
 import os
 from time import sleep
 
-CAMINHO_INICIO = os.path.join("articledb", "imagens", "inicio.png")
+CAMINHO_INICIO = os.path.join("imagens", "inicio.png")
 
 componentes = {
     'tf_pesquisa': ft.Ref[ft.TextField](),
