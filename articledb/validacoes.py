@@ -21,7 +21,6 @@ componente_filtro = {
     "Abstracts": ft.InputFilter(regex_string=FILTRO_ABSTRACTS, allow=True, replacement_string=""),
 }
 
-
 def validar_titulo(titulo: str) -> bool:
     """
     Valida o campo de título.
@@ -112,7 +111,6 @@ def validar_autores(autores: str) -> bool:
         return False
     
     return True
-
 
 def validar_ano(ano: str) -> bool:
     """

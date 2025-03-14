@@ -111,7 +111,7 @@ def salvar_edicao(e):
             bd.atualizar_dados_sintese(dados_sintese)
         
         voltar(e)
-        atualizar_feedback(f"O artigo '{titulo_antigo}' foi editado com sucesso.", ft.colors.RED)
+        atualizar_feedback(f"O artigo '{titulo_antigo}' foi editado com sucesso.", "green")
     
 
 modal_confirmacao = ft.AlertDialog(
