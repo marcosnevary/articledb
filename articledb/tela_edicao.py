@@ -6,6 +6,7 @@ from articledb.tela_sintese import modal_confirmacao
 from articledb.tela_cadastro import mudar_cor_campo
 from articledb.tela_principal import atualizar_feedback
 from articledb.utils import largura, criar_botao_sair, criar_botao_salvar
+from articledb.validacoes import validar_titulo, validar_link, validar_autores, validar_ano, validar_local, validar_abstracts
 import os
 
 CAMINHO_EDICAO = os.path.join("imagens", "edicao.png")
@@ -28,20 +29,20 @@ componentes = {
     "abstracts": ft.Ref[ft.TextField]()
 }
 
-feedback = ft.Container(
+feedback_edicao = ft.Container(
     content=ft.Text(value="", color="white"),
     alignment=ft.alignment.center,
     bgcolor="white", 
-    width=500,
+    width=largura,
     height=25,
     border_radius=10
 )
 
-def mudar_feedback(cor, msg):
-    feedback.bgcolor = cor
-    feedback.content.value = msg
-    if feedback.page:
-        feedback.update()
+def atualizar_feedback_edicao(msg, cor):
+    feedback_edicao.content.value = msg
+    feedback_edicao.bgcolor = cor
+    if feedback_edicao.page:
+        feedback_edicao.update()
 
 
 def mudar_cor_campo(e):
@@ -51,6 +52,8 @@ def mudar_cor_campo(e):
             componentes[componente].current.border_color = "black"
             componentes[componente].current.focused_border_color = "#3C618B"
             componentes[componente].current.update()
+    if all(componentes[chave].current.value.strip() for chave in list(componentes.keys())):
+        atualizar_feedback_edicao("", "white")
 
 
 def atualizar_edicao():
@@ -82,27 +85,49 @@ def voltar(e):
         componentes[chave].current.update()
     tela_principal.atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    mudar_feedback("white", "")
+    atualizar_feedback_edicao("white", "")
 
 
 def salvar_edicao(e):
-    permissao = True
+
+    funcoes_validacao = [
+        validar_titulo, validar_link, validar_autores,
+        validar_ano, validar_local, validar_abstracts
+    ]
+
+    campos = []
+
     for i, chave in enumerate(componentes):
-        if not componentes[chave].current.value.strip():
+        if not funcoes_validacao[i](componentes[chave].current.value):
+            campos.append(list(rotulo_componente.keys())[i])
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
-            permissao = False
-            mudar_feedback("red", "Campo(s) obrigatório(s) não preenchido(s).")
-    if permissao:
-        dados_finais = obter_dados_finais() + dados_iniciais[6:]
-        dados_tabela = bd.obter_dados_tabela()
+    
+    if campos and len(campos) == 1:
+        atualizar_feedback_edicao(f'O campo "{campos[0]}" é inválido.', "red")
+    
+    elif campos and len(campos) > 1:
+        atualizar_feedback_edicao(f'Os campos "{", ".join(campos)}" são inválidos.', "red")
 
+    dados_finais = obter_dados_finais() + dados_iniciais[6:]
+    dados_tabela = bd.obter_dados_tabela()
+    dados_sintese = bd.obter_dados_sintese()
+    titulo_antigo = dados_iniciais[0]
+    titulo_novo = dados_finais[0]
+
+    titulo_nao_existe = True
+    for linha in dados_tabela:
+        if titulo_antigo != titulo_novo and titulo_novo.upper() == linha[0].upper():
+            atualizar_feedback_edicao(f'Já existe um artigo cadastrado com esse título.', "red")
+            titulo_nao_existe = False
+            componentes["titulo"].current.border_color = ft.colors.RED
+            componentes["titulo"].current.update()
+
+    if not campos and titulo_nao_existe:
         dados_tabela[tela_principal.id_artigo] = dados_finais
 
         bd.atualizar_dados_tabela(["|".join(linha) for linha in dados_tabela])
 
-        titulo_antigo = dados_iniciais[0]
-        titulo_novo = dados_finais[0]
         dados_sintese = bd.obter_dados_sintese()
 
         if dados_sintese and titulo_novo != titulo_antigo:
@@ -111,7 +136,8 @@ def salvar_edicao(e):
             bd.atualizar_dados_sintese(dados_sintese)
         
         voltar(e)
-        atualizar_feedback(f"O artigo '{titulo_antigo}' foi editado com sucesso.", "green")
+        atualizar_feedback(f'O artigo "{titulo_antigo}" foi editado com sucesso.', "green")
+
     
 
 modal_confirmacao = ft.AlertDialog(
@@ -169,16 +195,32 @@ def view(existe_leitor: bool):
                             label=f"Leitor {i + 1}",
                             value=leitor,
                             disabled=True,
-                            width=500,
+                            width=largura,
                             border="underline"
                         ) for i, leitor in enumerate(obter_campo_leitores()) if existe_leitor
                     ] +
                     [
-                        feedback,
+                        feedback_edicao,
                         ft.Row(
                             controls=[
-                                criar_botao_sair(sair, "Sair"),
-                                criar_botao_salvar(salvar_edicao, "Salvar e Sair")
+                                ft.ElevatedButton(
+                                    "Sair",
+                                    on_click=sair,
+                                    icon="ARROW_BACK",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=295
+                                ),
+                                ft.ElevatedButton(
+                                    "Salvar e Sair",
+                                    on_click=salvar_edicao,
+                                    icon="SAVE",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=295
+                                )
                             ],
                             alignment=ft.MainAxisAlignment.CENTER
                         )
