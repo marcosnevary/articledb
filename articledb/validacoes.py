@@ -5,7 +5,7 @@ import datetime
 # Padrões de regex
 FILTRO_TITULO = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇ\s\-]*$"
 FILTRO_LINK = r"^[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]*$"
-FILTRO_AUTORES = r"^[A-ZÁÉÍÓÚÂÊÔÇ\s,\.;]*$"
+FILTRO_AUTORES = r"^[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇ\s,\.;]*$"
 FILTRO_ANO = r"^[0-9]*$"
 FILTRO_LOCAL = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇ\s\-]*$"
 FILTRO_ABSTRACTS = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇ\s\-]*$"
@@ -47,10 +47,10 @@ def validar_input(valor: str, campo: str) -> bool:
             
             padrao_link = ''.join(
                 (
-                    r"https?://",                           # Protocolo http ou https
-                    r"(?=[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-]+)",  # Deve haver pelo menos um ponto entre domínios
-                    r"(?!.*[\?\#&=%]$)",                    # Não pode terminar com certos caracteres na URL
-                    r".{4,}"                                # 4 caracteres ou mais no resto da URL
+                    r"https?://",                                   #  Protocolo http ou https
+                    r"(?=[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-]+)",          #  Deve haver pelo menos um ponto entre domínios
+                    r"(?!.*[\?\#&=%@_\-]$)",                        #  Não pode terminar com certos caracteres na URL
+                    r"[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]{4,}"    #  4 caracteres (permitidos) ou mais no resto da URL
                 )
             )
 
