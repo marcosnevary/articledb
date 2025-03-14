@@ -5,7 +5,7 @@ import flet as ft
 from articledb import controle
 from articledb import banco_de_dados as bd
 from articledb import tela_principal
-from articledb.utils import LARGURA_CAMPO, criar_botao_sair, criar_botao_salvar
+from articledb.utils import largura
 from articledb.feedback import feedback_registro, atualizar_feedback_registro
 
 
@@ -25,6 +25,21 @@ componentes = {
     "lacunas": ft.Ref[ft.TextField](),
     "observacoes": ft.Ref[ft.TextField]()
 }
+
+feedback_sintese = ft.Container(
+    content=ft.Text(value="", color="white"),
+    alignment=ft.alignment.center,
+    bgcolor="white", 
+    width=largura,
+    height=25,
+    border_radius=10
+)
+
+def atualizar_feedback_sintese(cor, msg):
+    feedback_sintese.bgcolor = cor
+    feedback_sintese.content.value = msg
+    if feedback_sintese.page:
+        feedback_sintese.update()
 
 
 def mudar_cor_campo_sintese(e):
@@ -87,7 +102,7 @@ campo_artigo = ft.TextField(
     label="Artigo",
     disabled=True,
     value=" ",
-    width=LARGURA_CAMPO,
+    width=largura,
     border="underline"
 )
 
@@ -95,7 +110,7 @@ campo_leitor = ft.TextField(
     label="Leitor",
     disabled=True,
     value=" ",
-    width=LARGURA_CAMPO,
+    width=largura,
     border="underline"
 )
 
@@ -154,7 +169,7 @@ def view():
                             ref=componentes[rotulo_componente[rotulo]],
                             on_change=mudar_cor_campo_sintese,
                             border="underline",
-                            width=LARGURA_CAMPO,
+                            width=largura,
                             multiline=True
                         ) for rotulo in rotulo_componente
                     ] + 
@@ -162,8 +177,24 @@ def view():
                         feedback_registro,
                         ft.Row(
                             controls=[
-                                criar_botao_sair(sair, "Sair"),
-                                criar_botao_salvar(salvar_sintese, "Salvar e Sair")
+                                ft.ElevatedButton(
+                                    "Sair",
+                                    on_click=sair,
+                                    icon="ARROW_BACK",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=295
+                                ),
+                                ft.ElevatedButton(
+                                    "Salvar e Sair",
+                                    on_click=salvar_sintese,
+                                    icon="SAVE",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=295
+                                )
                             ],
                             alignment=ft.MainAxisAlignment.CENTER
                         )

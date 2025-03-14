@@ -1,6 +1,6 @@
 import flet as ft
 
-LARGURA_CAMPO = 500
+largura = 600
 
 def criar_botao_sair(funcao, texto):
     return ft.ElevatedButton(

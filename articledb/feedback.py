@@ -6,24 +6,8 @@ from articledb import controle
 
 # GERAL
 
-def atualizar_feedback_leitor(cor, msg):
-    feedback_leitor.bgcolor = cor
-    feedback_leitor.content.value = msg
-    if feedback_leitor.page:
-        feedback_leitor.update()
 
-
-feedback_leitor = ft.Container(
-    content=ft.Text(value="", color="white"),
-    alignment=ft.alignment.center,
-    bgcolor="white",
-    width=250,
-    height=25,
-    border_radius=10
-)
-
-
-def atualizar_feedback(msg, cor):
+def atualizar_feedback_tela_principal(msg, cor):
     txt_mensagem_feedback.value = msg
     container_mensagem_feedback.bgcolor = cor
 
@@ -46,6 +30,23 @@ container_mensagem_feedback = ft.Container(
     width=2000,
     expand=True,
     alignment=ft.alignment.center,
+    height=25,
+    border_radius=10
+)
+
+
+def atualizar_feedback_leitor(cor, msg):
+    feedback_leitor.bgcolor = cor
+    feedback_leitor.content.value = msg
+    if feedback_leitor.page:
+        feedback_leitor.update()
+
+
+feedback_leitor = ft.Container(
+    content=ft.Text(value="", color="white"),
+    alignment=ft.alignment.center,
+    bgcolor="white",
+    width=250,
     height=25,
     border_radius=10
 )
