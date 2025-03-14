@@ -1,12 +1,12 @@
 import flet as ft
-import banco_de_dados as bd
-import controle
-from tela_principal import atualizar_tabela, atualizar_feedback
+from articledb import banco_de_dados as bd
+from articledb import controle
+from articledb.tela_principal import atualizar_tabela, atualizar_feedback
 import os
-import validacoes
-from utils import largura
+from articledb import validacoes
+from articledb.utils import largura
 
-CAMINHO_CADASTRO = os.path.join("articledb", "imagens", "cadastro.png")
+CAMINHO_CADASTRO = os.path.join("imagens", "cadastro.png")
 
 rotulo_componente = {
     "Título": "titulo",

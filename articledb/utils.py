@@ -1,5 +1,4 @@
 import flet as ft
-import controle
 
 largura = 500
 
