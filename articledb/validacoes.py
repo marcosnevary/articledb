@@ -105,7 +105,7 @@ def validar_autores(autores: str) -> bool:
             
     autores = autores.split(';') if ';' in autores else [autores]
 
-    padrao_autores = r"[A-Z]+,\s[A-Z]\." # "SOBRENOME, N." (N = Nome)
+    padrao_autores = r"[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇ]+,\s[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇ]\." # "SOBRENOME, N." (N = Nome)
 
     if not all(re.fullmatch(padrao_autores, autor) for autor in autores):
         return False
