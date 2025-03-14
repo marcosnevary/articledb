@@ -1,8 +1,9 @@
 import flet as ft
 import banco_de_dados as bd
 import controle
-from tela_principal import atualizar_tabela
+from tela_principal import atualizar_tabela, atualizar_feedback
 import os
+import validacoes
 from utils import largura
 
 CAMINHO_CADASTRO = os.path.join("articledb", "imagens", "cadastro.png")
@@ -25,7 +26,7 @@ componentes = {
     "abstracts": ft.Ref[ft.TextField]()
 }    
 
-feedback = ft.Container(
+feedback_cadastro = ft.Container(
     content=ft.Text(value="", color="white"),
     alignment=ft.alignment.center,
     bgcolor="white", 
@@ -34,12 +35,12 @@ feedback = ft.Container(
     border_radius=10
 )
 
-def atualizar_feedback(cor, msg):
-    feedback.bgcolor = cor
-    feedback.content.value = msg
-    if feedback.page:
-        feedback.update()
-    
+def atualizar_feedback_cadastro(cor, msg):
+    feedback_cadastro.bgcolor = cor
+    feedback_cadastro.content.value = msg
+    if feedback_cadastro.page:
+        feedback_cadastro.update()
+
 
 def mudar_cor_campo(e):
     for rotulo in rotulo_componente:
@@ -57,7 +58,7 @@ def voltar(e):
         componentes[chave].current.update()
     atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    atualizar_feedback("white", "")
+    atualizar_feedback_cadastro("white", "")
     for chave in componentes:
         componentes[chave].current.value = ""
 
@@ -72,7 +73,7 @@ def salvar_cadastro(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            atualizar_feedback("red", "Campo(s) obrigatório(s) não preenchido(s).")
+            atualizar_feedback_cadastro("red", "Campo(s) obrigatório(s) não preenchido(s).")
 
     if permissao:
         artigo = [campo.current.value for campo in componentes.values()]
@@ -99,6 +100,7 @@ def salvar_cadastro(e):
         bd.atualizar_dados_sintese(dados_sintese)
 
         voltar(e)
+        atualizar_feedback(f'O artigo "{titulo}" foi adicionado com sucesso.', 'green')
 
 def obter_campo_leitores():
     dados_tabela = bd.obter_dados_tabela()
@@ -121,7 +123,8 @@ def view(existe_leitor=False):
                             ref=componentes[rotulo_componente[rotulo]],
                             width=largura,
                             on_change=mudar_cor_campo,
-                            border="underline"
+                            border="underline",
+                            input_filter=validacoes.componente_filtro[rotulo]
                         ) for rotulo in rotulo_componente
                     ] + 
                     [
@@ -134,7 +137,7 @@ def view(existe_leitor=False):
                         ) for i, leitor in enumerate(obter_campo_leitores()) if existe_leitor
                     ] + 
                     [
-                        feedback,
+                        feedback_cadastro,
                         ft.Row(
                             controls=[
                                 ft.ElevatedButton(

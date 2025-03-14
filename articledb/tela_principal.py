@@ -209,7 +209,7 @@ def adicionar_leitor(e):
         fechar_modal_leitor(e)
         limpar_pesquisa(e)
 
-        atualizar_feedback(f"O leitor '{nome_leitor}' foi adicionado com sucesso." , "green") #mensagem de feedback
+        atualizar_feedback(f'O leitor "{nome_leitor}" foi adicionado com sucesso.' , 'green') #mensagem de feedback
 
 
 def mudar_cor_campo(e):
@@ -352,7 +352,7 @@ def excluir_artigo(e):
             tabela.columns = tabela.columns[:8]
             tabela.update()
 
-    atualizar_feedback(f"O artigo '{artigo_excluido[0]}' foi excluído com sucesso.", ft.colors.RED)
+    atualizar_feedback(f'O artigo "{artigo_excluido[0]}" foi excluído com sucesso.', "red")
     
 
 def abrir_modal_excluir_artigo(e):
@@ -439,7 +439,7 @@ def remover_leitor(e):
 
     #atualizando a tabela
     atualizar_tabela(bd.obter_dados_tabela())
-    atualizar_feedback(f"O leitor '{nome_leitor}' foi excluído com sucesso.", ft.colors.RED)
+    atualizar_feedback(f'O leitor "{nome_leitor}" foi excluído com sucesso.', "red")
 
     tabela.update()
 
@@ -450,7 +450,7 @@ def abrir_modal_excluir_leitor(e):
     nome_leitor = dados_tabela[0][id_leitor]
 
     modal_excluir_leitor.actions[0].key = id_leitor
-    modal_excluir_leitor.title.value = f"Você deseja excluir o leitor '{nome_leitor}'?"
+    modal_excluir_leitor.title.value = f'Você deseja excluir o leitor "{nome_leitor}"?'
 
     controle.pagina.open(modal_excluir_leitor)
 
