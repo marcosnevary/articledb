@@ -3,12 +3,12 @@ import re
 import datetime
 
 # Padrões de regex
-FILTRO_TITULO = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇ\s\-\.,;:!?&]*$"
+FILTRO_TITULO = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s\-\.,;:!?&]*$"
 FILTRO_LINK = r"^[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]*$"
-FILTRO_AUTORES = r"^[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇ\s,\.;]*$"
+FILTRO_AUTORES = r"^[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s,\.;]*$"
 FILTRO_ANO = r"^[0-9]*$"
-FILTRO_LOCAL = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇ\s\-]*$"
-FILTRO_ABSTRACTS = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇ\s\-]*$"
+FILTRO_LOCAL = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s\-]*$"
+FILTRO_ABSTRACTS = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s\-]*$"
 
 
 # Dicionário de filtro
@@ -105,7 +105,7 @@ def validar_autores(autores: str) -> bool:
             
     autores = autores.split(';') if ';' in autores else [autores]
 
-    padrao_autores = r"[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇ]+,\s[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇ]\." # "SOBRENOME, N." (N = Nome)
+    padrao_autores = r"[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ]+,\s[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ]\." # "SOBRENOME, N." (N = Nome)
 
     if not all(re.fullmatch(padrao_autores, autor) for autor in autores):
         return False
