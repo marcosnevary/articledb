@@ -44,6 +44,8 @@ def mudar_cor_campo_sintese(e):
             componentes[componente].current.border_color = "black"
             componentes[componente].current.focused_border_color = "#3C618B"
             componentes[componente].current.update()
+    if all(componentes[chave].current.value.strip() for chave in list(componentes.keys())[:3]):
+        atualizar_feedback_sintese("white", "")
 
 
 def voltar(e):
@@ -78,7 +80,7 @@ def salvar_sintese(e):
         bd.atualizar_dados_sintese(controle.dados_sintese)
         voltar(e)
         tela_principal.atualizar_feedback(
-            f'A síntese do leitor "{tela_principal.leitor}" no artigo "{tela_principal.artigo}" foi modificada com sucesso.',
+            f'A síntese do leitor "{tela_principal.leitor}" no artigo "{tela_principal.artigo}" foi alterada com sucesso.',
             "green"
         )
 
