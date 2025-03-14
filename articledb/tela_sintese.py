@@ -25,7 +25,7 @@ feedback_sintese = ft.Container(
     content=ft.Text(value="", color="white"),
     alignment=ft.alignment.center,
     bgcolor="white", 
-    width=500,
+    width=largura,
     height=25,
     border_radius=10
 )
@@ -170,8 +170,24 @@ def view():
                         feedback_sintese,
                         ft.Row(
                             controls=[
-                                criar_botao_sair(sair, "Sair"),
-                                criar_botao_salvar(salvar_sintese, "Salvar e Sair")
+                                ft.ElevatedButton(
+                                    "Sair",
+                                    on_click=sair,
+                                    icon="ARROW_BACK",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=295
+                                ),
+                                ft.ElevatedButton(
+                                    "Salvar e Sair",
+                                    on_click=salvar_sintese,
+                                    icon="SAVE",
+                                    color="white",
+                                    bgcolor="#3254B4",
+                                    icon_color="white",
+                                    width=295
+                                )
                             ],
                             alignment=ft.MainAxisAlignment.CENTER
                         )

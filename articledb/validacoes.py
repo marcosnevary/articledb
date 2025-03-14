@@ -39,9 +39,11 @@ def validar_titulo(titulo: str) -> bool:
 
     titulo = str(titulo).strip()
 
+    if not titulo:
+        return False
+
     if not (3 <= len(titulo) <= 350):
         return False
-    
 
     if not re.fullmatch(FILTRO_TITULO, titulo):
         return False
@@ -65,6 +67,9 @@ def validar_link(link: str) -> bool:
         bool: Verdadeiro se cumprir os requisitos. Falso caso contrário.
     """
     link = str(link).strip()
+
+    if not link:
+        return False
 
     if not (11 <= len(link) <= 2000):
         return False
@@ -100,17 +105,14 @@ def validar_autores(autores: str) -> bool:
     """
     autores = str(autores).strip()
 
-    if not (5 <= len(autores) <= 400):
+    if not autores:
         return False
-            
-    autores = autores.split(';') if ';' in autores else [autores]
 
-    padrao_autores = r"[A-Z]+,\s[A-Z]\." # "SOBRENOME, N." (N = Nome)
-
-    if not all(re.fullmatch(padrao_autores, autor) for autor in autores):
+    if not (5 <= len(autores) <= 400):
         return False
     
     return True
+
 
 def validar_ano(ano: str) -> bool:
     """
@@ -129,6 +131,9 @@ def validar_ano(ano: str) -> bool:
         bool: Verdadeiro se cumprir os requisitos. Falso caso contrário.
     """
     ano = str(ano).strip()
+
+    if not ano:
+        return False
 
     if len(ano) != 4:
         return False
@@ -163,6 +168,9 @@ def validar_local(local: str) -> bool:
     """
     local = str(local).strip()
 
+    if not local:
+        return False
+
     if not (2 <= len(local) <= 22):
         return False
     
@@ -187,6 +195,9 @@ def validar_abstracts(abstracts: str) -> bool:
         bool: Verdadeiro se cumprir os requisitos. Falso caso contrário.
     """
     abstracts = str(abstracts).strip()
+
+    if not abstracts:
+        return False
 
     if not (1 <= len(abstracts) <= 2000):
         return False
