@@ -5,7 +5,7 @@ padrao_link = ''.join(
     (
         r"https?://",                                   #  Protocolo http ou https
         r"(?=[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-]+)",          #  Deve haver pelo menos um ponto entre domínios
-        r"(?!.*[\?\#&=%]$)",                            #  Não pode terminar com certos caracteres na URL
+        r"(?!.*[\?\#&=%@_\-]$)",                            #  Não pode terminar com certos caracteres na URL
         r"[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]{4,}"    #  4 caracteres ou mais no resto da URL
     )
 )
@@ -44,15 +44,16 @@ urls_validos = urls = {
     "https://example.com/query?data=%5B1,2,3%5D": True,                                 # 
     "https://example.com/info?name=J%20Doe&location=NYC": True,                         # 
     "https://example.com/api?value=%23hash": True,                                      # 
-    "https://example.com/path?msg=Hello%2C%20World%21": True                            # 
+    "https://example.com/path?msg=Hello%2C%20World%21": True,                           # 
+    "https://www.example.com/": True,
+    "https://www.example.com.": True,
 }
 
-formatador1 = max(len(url) for url in urls_validos.keys())
+formatador = max(len(url) for url in urls_validos)
 for url, validade in urls_validos.items():
-    resultado1 = teste(url)
-    print(f"URL: {url:<{formatador1}} | Esperado: {validade} | Resultado: {resultado1}")
+    print(f"URL: {url:<{formatador}} | Esperado: {validade} | Resultado: {teste(url)}")
 
-print("-" * 106)
+print("-" * 110)
 # URLs inválidos
 
 urls_invalidos = {
@@ -60,6 +61,7 @@ urls_invalidos = {
     "https:/ /www.example.com": False,
     "ftp://files.server.com": False,
     "https://": False,
+    "https": False,
     "https://a.c": False,
     "https://w": False,
     "https://example.com/data?filter=[{\"field\":\"name\",\"value\":\"John\"}]": False,
@@ -82,11 +84,14 @@ urls_invalidos = {
     "": False,
     "https://example.com/space here": False,
     "https://example.com/<script>": False,
-
+    "https://www.example.com/#": False,
+    "https://www.example.com/?": False,
+    "https://www.example.com/@": False,
+    "https://www.example.com/_": False,
+    "https://www.example.com/-": False,
 }
 
 
-formatador2 = max(len(url) for url in urls_invalidos.keys())
+formatador = max(len(url) for url in urls_invalidos)
 for url, validade in urls_invalidos.items():
-    resultado2 = teste(url)
-    print(f"URL: {url:<{formatador2}} | Esperado: {validade} | Resultado: {resultado2}")
+    print(f"URL: {url:<{formatador}} | Esperado: {validade} | Resultado: {teste(url)}")
