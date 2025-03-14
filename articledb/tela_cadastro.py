@@ -1,12 +1,15 @@
 import flet as ft
 from articledb import banco_de_dados as bd
 from articledb import controle
-from articledb.tela_principal import atualizar_tabela, atualizar_feedback
+from articledb.tela_principal import atualizar_tabela, atualizar_feedback_tela_principal
+from articledb.feedback import feedback_registro, atualizar_feedback_registro
 import os
 from articledb import validacoes
-from articledb.utils import largura
+from articledb.utils import LARGURA_CAMPO
+
 
 CAMINHO_CADASTRO = os.path.join("imagens", "cadastro.png")
+
 
 rotulo_componente = {
     "Título": "titulo",
@@ -17,6 +20,7 @@ rotulo_componente = {
     "Abstracts": "abstracts"
 }
 
+
 componentes = {
     "titulo": ft.Ref[ft.TextField](),
     "link": ft.Ref[ft.TextField](),
@@ -26,23 +30,8 @@ componentes = {
     "abstracts": ft.Ref[ft.TextField]()
 }    
 
-feedback_cadastro = ft.Container(
-    content=ft.Text(value="", color="white"),
-    alignment=ft.alignment.center,
-    bgcolor="white", 
-    width=500,
-    height=25,
-    border_radius=10
-)
 
-def atualizar_feedback_cadastro(cor, msg):
-    feedback_cadastro.bgcolor = cor
-    feedback_cadastro.content.value = msg
-    if feedback_cadastro.page:
-        feedback_cadastro.update()
-
-
-def mudar_cor_campo(e):
+def mudar_cor_campo_registro(e):
     for rotulo in rotulo_componente:
         if rotulo == e.control.label:
             componente = rotulo_componente[rotulo]
@@ -51,14 +40,14 @@ def mudar_cor_campo(e):
             componentes[componente].current.update()
 
 
-def voltar(e):
+def voltar_c2p(e):
     for chave in componentes.keys():
         componentes[chave].current.border_color = "black"
         componentes[chave].current.focused_border_color = "#3C618B"
         componentes[chave].current.update()
     atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    atualizar_feedback_cadastro("white", "")
+    atualizar_feedback_registro("white", "")
     for chave in componentes:
         componentes[chave].current.value = ""
 
@@ -73,7 +62,7 @@ def salvar_cadastro(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            atualizar_feedback_cadastro("red", "Campo(s) obrigatório(s) não preenchido(s).")
+            atualizar_feedback_registro("red", "Campo(s) obrigatório(s) não preenchido(s).")
 
     if permissao:
         artigo = [campo.current.value for campo in componentes.values()]
@@ -99,8 +88,9 @@ def salvar_cadastro(e):
         bd.atualizar_dados_tabela(["|".join(linha) for linha in dados_tabela])
         bd.atualizar_dados_sintese(dados_sintese)
 
-        voltar(e)
-        atualizar_feedback(f'O artigo "{titulo}" foi adicionado com sucesso.', 'green')
+        voltar_c2p(e)
+        atualizar_feedback_tela_principal(f'O artigo "{titulo}" foi adicionado com sucesso.', 'green')
+
 
 def obter_campo_leitores():
     dados_tabela = bd.obter_dados_tabela()
@@ -110,6 +100,7 @@ def obter_campo_leitores():
         return []
 
 
+#View
 def view(existe_leitor=False):
     return ft.View(
         route="Tela de Cadastro",
@@ -121,8 +112,8 @@ def view(existe_leitor=False):
                         ft.TextField(
                             label=rotulo,
                             ref=componentes[rotulo_componente[rotulo]],
-                            width=largura,
-                            on_change=mudar_cor_campo,
+                            width=LARGURA_CAMPO,
+                            on_change=mudar_cor_campo_registro,
                             border="underline",
                             input_filter=validacoes.componente_filtro[rotulo]
                         ) for rotulo in rotulo_componente
@@ -132,17 +123,17 @@ def view(existe_leitor=False):
                             label=f"Leitor {i + 1}",
                             value=leitor,
                             disabled=True,
-                            width=500,
+                            width=LARGURA_CAMPO,
                             border="underline"
                         ) for i, leitor in enumerate(obter_campo_leitores()) if existe_leitor
                     ] + 
                     [
-                        feedback_cadastro,
+                        feedback_registro,
                         ft.Row(
                             controls=[
                                 ft.ElevatedButton(
                                     "Sair",
-                                    on_click=voltar,
+                                    on_click=voltar_c2p,
                                     icon="CLEAR",
                                     color="white",
                                     bgcolor="#3254B4",

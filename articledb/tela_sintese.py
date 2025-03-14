@@ -1,11 +1,16 @@
+import os
+
 import flet as ft
+
 from articledb import controle
 from articledb import banco_de_dados as bd
 from articledb import tela_principal
-import os
-from articledb.utils import largura, criar_botao_sair, criar_botao_salvar
+from articledb.utils import LARGURA_CAMPO, criar_botao_sair, criar_botao_salvar
+from articledb.feedback import feedback_registro, atualizar_feedback_registro
+
 
 CAMINHO_SINTESE = os.path.join("imagens", "sintese.png")
+
 
 rotulo_componente = {
     "Objetivo": "objetivo",
@@ -21,21 +26,6 @@ componentes = {
     "observacoes": ft.Ref[ft.TextField]()
 }
 
-feedback_sintese = ft.Container(
-    content=ft.Text(value="", color="white"),
-    alignment=ft.alignment.center,
-    bgcolor="white", 
-    width=500,
-    height=25,
-    border_radius=10
-)
-
-def atualizar_feedback_sintese(cor, msg):
-    feedback_sintese.bgcolor = cor
-    feedback_sintese.content.value = msg
-    if feedback_sintese.page:
-        feedback_sintese.update()
-
 
 def mudar_cor_campo_sintese(e):
     for rotulo in rotulo_componente:
@@ -45,7 +35,7 @@ def mudar_cor_campo_sintese(e):
             componentes[componente].current.focused_border_color = "#3C618B"
             componentes[componente].current.update()
     if all(componentes[chave].current.value.strip() for chave in list(componentes.keys())[:3]):
-        atualizar_feedback_sintese("white", "")
+        atualizar_feedback_registro("white", "")
 
 
 def voltar(e):
@@ -55,7 +45,7 @@ def voltar(e):
         componentes[chave].current.update()
     tela_principal.atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    atualizar_feedback_sintese("white", "")
+    atualizar_feedback_registro("white", "")
 
 
 def obter_dados_finais():
@@ -72,14 +62,14 @@ def salvar_sintese(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            atualizar_feedback_sintese("red", "Campo(s) obrigatório(s) não preenchido(s).")
+            atualizar_feedback_registro("red", "Campo(s) obrigatório(s) não preenchido(s).")
     if permissao:
         dados_finais = obter_dados_finais()
         controle.dados_sintese[tela_principal.artigo][tela_principal.leitor] = dados_finais
-        print(dados_finais)
+        # print(dados_finais)
         bd.atualizar_dados_sintese(controle.dados_sintese)
         voltar(e)
-        tela_principal.atualizar_feedback(
+        tela_principal.atualizar_feedback_tela_principal(
             f'A síntese do leitor "{tela_principal.leitor}" no artigo "{tela_principal.artigo}" foi alterada com sucesso.',
             "green"
         )
@@ -97,7 +87,7 @@ campo_artigo = ft.TextField(
     label="Artigo",
     disabled=True,
     value=" ",
-    width=largura,
+    width=LARGURA_CAMPO,
     border="underline"
 )
 
@@ -105,7 +95,7 @@ campo_leitor = ft.TextField(
     label="Leitor",
     disabled=True,
     value=" ",
-    width=largura,
+    width=LARGURA_CAMPO,
     border="underline"
 )
 
@@ -145,6 +135,8 @@ modal_confirmacao = ft.AlertDialog(
     ]
 )
 
+
+#View
 def view():
     return ft.View(
         route="Tela de Síntese",
@@ -162,12 +154,12 @@ def view():
                             ref=componentes[rotulo_componente[rotulo]],
                             on_change=mudar_cor_campo_sintese,
                             border="underline",
-                            width=largura,
+                            width=LARGURA_CAMPO,
                             multiline=True
                         ) for rotulo in rotulo_componente
                     ] + 
                     [
-                        feedback_sintese,
+                        feedback_registro,
                         ft.Row(
                             controls=[
                                 criar_botao_sair(sair, "Sair"),

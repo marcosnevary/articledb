@@ -8,7 +8,7 @@ FILTRO_LINK = r"^[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]*$"
 FILTRO_AUTORES = r"^[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s,\.;]*$"
 FILTRO_ANO = r"^[0-9]*$"
 FILTRO_LOCAL = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s\-]*$"
-FILTRO_ABSTRACTS = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s\-]*$"
+FILTRO_ABSTRACTS = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s\-\.,;:!?&]*$"
 
 
 # Dicionário de filtro
@@ -217,3 +217,7 @@ def achar_nome_tela_principal(string:str, artigo:list)->list:
             return True
     
     return False #retornando false se nada der match
+
+ft.Text(
+    
+)

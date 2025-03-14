@@ -1,56 +1,23 @@
+import os
+
 import flet as ft
+
 from articledb import tela_principal
 from articledb import controle
 from articledb import banco_de_dados as bd
 from articledb.tela_sintese import modal_confirmacao
-from articledb.tela_cadastro import mudar_cor_campo
-from articledb.tela_principal import atualizar_feedback
-from articledb.utils import largura, criar_botao_sair, criar_botao_salvar
-import os
+from articledb.tela_cadastro import (
+    mudar_cor_campo_registro,
+    rotulo_componente,
+    componentes,
+    obter_campo_leitores,
+)
+from articledb.tela_principal import atualizar_feedback_tela_principal
+from articledb.feedback import feedback_registro, atualizar_feedback_registro
+from articledb.utils import LARGURA_CAMPO, criar_botao_sair, criar_botao_salvar
+
 
 CAMINHO_EDICAO = os.path.join("imagens", "edicao.png")
-
-rotulo_componente = {
-    "Título": "titulo",
-    "Link": "link",
-    "Autores": "autores",
-    "Ano": "ano",
-    "Local de Publicação": "local",
-    "Abstracts": "abstracts"
-}
-
-componentes = {
-    "titulo": ft.Ref[ft.TextField](),
-    "link": ft.Ref[ft.TextField](),
-    "autores": ft.Ref[ft.TextField](),
-    "ano": ft.Ref[ft.TextField](),
-    "local": ft.Ref[ft.TextField](),
-    "abstracts": ft.Ref[ft.TextField]()
-}
-
-feedback = ft.Container(
-    content=ft.Text(value="", color="white"),
-    alignment=ft.alignment.center,
-    bgcolor="white", 
-    width=500,
-    height=25,
-    border_radius=10
-)
-
-def mudar_feedback(cor, msg):
-    feedback.bgcolor = cor
-    feedback.content.value = msg
-    if feedback.page:
-        feedback.update()
-
-
-def mudar_cor_campo(e):
-    for rotulo in rotulo_componente:
-        if rotulo == e.control.label:
-            componente = rotulo_componente[rotulo]
-            componentes[componente].current.border_color = "black"
-            componentes[componente].current.focused_border_color = "#3C618B"
-            componentes[componente].current.update()
 
 
 def atualizar_edicao():
@@ -67,22 +34,22 @@ def obter_dados_finais():
     return lista
 
 
-def sair(e):
+def sair_confirmacao(e):
     dados_finais = obter_dados_finais() + dados_iniciais[6:]
     if dados_iniciais != dados_finais:
         controle.pagina.open(modal_confirmacao)
     else:
-        voltar(e)
+        voltar_e2p(e)
 
 
-def voltar(e):
+def voltar_e2p(e):
     for chave in componentes.keys():
         componentes[chave].current.border_color = ft.colors.BLACK
         componentes[chave].current.focused_border_color = "#3C618B"
         componentes[chave].current.update()
     tela_principal.atualizar_tabela(bd.obter_dados_tabela())
-    controle.pagina.go('1')
-    mudar_feedback("white", "")
+    controle.pagina.go("1")
+    atualizar_feedback_registro("white", "")
 
 
 def salvar_edicao(e):
@@ -92,7 +59,9 @@ def salvar_edicao(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            mudar_feedback("red", "Campo(s) obrigatório(s) não preenchido(s).")
+            atualizar_feedback_registro(
+                "red", "Campo(s) obrigatório(s) não preenchido(s)."
+            )
     if permissao:
         dados_finais = obter_dados_finais() + dados_iniciais[6:]
         dados_tabela = bd.obter_dados_tabela()
@@ -109,10 +78,12 @@ def salvar_edicao(e):
             dados_sintese[titulo_novo] = dados_sintese[titulo_antigo]
             del dados_sintese[titulo_antigo]
             bd.atualizar_dados_sintese(dados_sintese)
-        
-        voltar(e)
-        atualizar_feedback(f"O artigo '{titulo_antigo}' foi editado com sucesso.", "green")
-    
+
+        voltar_e2p(e)
+        atualizar_feedback_tela_principal(
+            f"O artigo '{titulo_antigo}' foi editado com sucesso.", "green"
+        )
+
 
 modal_confirmacao = ft.AlertDialog(
     modal=True,
@@ -127,7 +98,7 @@ modal_confirmacao = ft.AlertDialog(
             bgcolor="#3254B4",
             icon_color="white",
             width=200,
-            on_click=voltar
+            on_click=voltar_e2p,
         ),
         ft.ElevatedButton(
             "Não",
@@ -136,19 +107,13 @@ modal_confirmacao = ft.AlertDialog(
             bgcolor="#3254B4",
             icon_color="white",
             width=200,
-            on_click=lambda e: controle.pagina.close(modal_confirmacao)
-        )
-    ]
+            on_click=lambda e: controle.pagina.close(modal_confirmacao),
+        ),
+    ],
 )
 
-def obter_campo_leitores():
-    dados_tabela = bd.obter_dados_tabela()
-    if dados_tabela:
-        return dados_tabela[0][6:]
-    else:
-        return []
 
-
+# View
 def view(existe_leitor: bool):
     return ft.View(
         route="Tela de Edição",
@@ -160,35 +125,39 @@ def view(existe_leitor: bool):
                         ft.TextField(
                             label=rotulo,
                             ref=componentes[rotulo_componente[rotulo]],
-                            on_change=mudar_cor_campo,
-                            width=largura,
-                            border="underline"
-                        ) for rotulo in rotulo_componente
-                    ] + [
+                            on_change=mudar_cor_campo_registro,
+                            width=LARGURA_CAMPO,
+                            border="underline",
+                        )
+                        for rotulo in rotulo_componente
+                    ]
+                    + [
                         ft.TextField(
                             label=f"Leitor {i + 1}",
                             value=leitor,
                             disabled=True,
                             width=500,
-                            border="underline"
-                        ) for i, leitor in enumerate(obter_campo_leitores()) if existe_leitor
-                    ] +
-                    [
-                        feedback,
+                            border="underline",
+                        )
+                        for i, leitor in enumerate(obter_campo_leitores())
+                        if existe_leitor
+                    ]
+                    + [
+                        feedback_registro,
                         ft.Row(
                             controls=[
-                                criar_botao_sair(sair, "Sair"),
-                                criar_botao_salvar(salvar_edicao, "Salvar e Sair")
+                                criar_botao_sair(sair_confirmacao, "Sair"),
+                                criar_botao_salvar(salvar_edicao, "Salvar e Sair"),
                             ],
-                            alignment=ft.MainAxisAlignment.CENTER
-                        )
+                            alignment=ft.MainAxisAlignment.CENTER,
+                        ),
                     ],
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
-                padding=30
-            )
+                padding=30,
+            ),
         ],
         padding=0,
         bgcolor=ft.colors.WHITE,
-        scroll=ft.ScrollMode.AUTO
+        scroll=ft.ScrollMode.AUTO,
     )
