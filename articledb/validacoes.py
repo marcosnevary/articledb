@@ -3,12 +3,12 @@ import re
 import datetime
 
 # Padrões de regex
-FILTRO_TITULO = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s\-\.,;:!?&]*$"
+FILTRO_TITULO = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕàÀ\s\-\.,;:!?&]*$"
 FILTRO_LINK = r"^[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]*$"
 FILTRO_AUTORES = r"^[a-zA-ZáéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s,\.;]*$"
 FILTRO_ANO = r"^[0-9]*$"
-FILTRO_LOCAL = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s\-]*$"
-FILTRO_ABSTRACTS = r"^[a-zA-Z0-9áéíóúÁÉÍÓÚâêôÂÊÔçÇãõÃÕ\s\-\.,;:!?&]*$"
+FILTRO_LOCAL = r"^.*$"
+FILTRO_ABSTRACTS = r"^.*$"
 
 
 # Dicionário de filtro
@@ -155,10 +155,7 @@ def validar_local(local: str) -> bool:
     Valida o campo de local de publicação.
 
     Mínimo: 2. 
-    Referência: https://en.wikipedia.org/wiki/List_of_short_place_names#:~:text=Bo%2C%20a%20city%20in%20Sierra%20Leone
-
-    Máximo: 22. 
-    Referência: https://en.wikipedia.org/wiki/List_of_long_place_names#:~:text=Parangaricutirimicuaro,Juan%2C%20and%20Parangaricutiro.
+    Máximo: 400. 
     
     Args:
         valor (str): Valor no campo "Local de Publicação".
@@ -171,7 +168,7 @@ def validar_local(local: str) -> bool:
     if not local:
         return False
 
-    if not (2 <= len(local) <= 22):
+    if not (2 <= len(local) <= 500):
         return False
     
     if not re.fullmatch(FILTRO_LOCAL, local):

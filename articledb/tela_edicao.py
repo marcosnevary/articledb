@@ -172,7 +172,7 @@ modal_confirmacao = ft.AlertDialog(
 
 
 # View
-def view(existe_leitor: bool):
+def view():
     return ft.View(
         route="Tela de Edição",
         controls=[
@@ -198,7 +198,7 @@ def view(existe_leitor: bool):
                             disabled=True,
                             width=largura,
                             border="underline"
-                        ) for i, leitor in enumerate(obter_campo_leitores()) if existe_leitor
+                        ) for i, leitor in enumerate(obter_campo_leitores())
                     ] +
                     [
                         feedback_edicao,
