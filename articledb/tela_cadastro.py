@@ -39,7 +39,7 @@ rotulo_dica = {
     "Link": "Deve começar com http:// ou https:// (exemplo: https://x.com)",
     "Autores": "Autor1, Autor2, Autor3 etc.",
     "Ano": f"Entre 1665 e {datetime.datetime.now().year}",
-    "Local de Publicação": "Cidade",
+    "Local de Publicação": "",
     "Abstracts": ""
 }
 
@@ -150,7 +150,7 @@ def obter_campo_leitores():
 
 
 #View
-def view(existe_leitor=False):
+def view():
     return ft.View(
         route="Tela de Cadastro",
         controls=[
@@ -176,7 +176,7 @@ def view(existe_leitor=False):
                             disabled=True,
                             width=largura,
                             border="underline"
-                        ) for i, leitor in enumerate(obter_campo_leitores()) if existe_leitor
+                        ) for i, leitor in enumerate(obter_campo_leitores())
                     ] + 
                     [
                         feedback_cadastro,

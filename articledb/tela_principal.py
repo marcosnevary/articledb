@@ -269,7 +269,8 @@ modal_leitor = ft.AlertDialog(
                 on_change=mudar_cor_campo_modal,
                 on_submit=adicionar_leitor,
                 input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
-                border="underline"
+                border="underline",
+                max_length=60
             ),
             feedback_leitor
         ],
@@ -538,7 +539,8 @@ modal_edita_leitor = ft.AlertDialog(
                 on_change=mudar_cor_campo_modal,
                 input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
                 border="underline",
-                on_submit=editar_leitor
+                on_submit=editar_leitor,
+                max_length=60
             ),
             feedback_leitor
         ],
