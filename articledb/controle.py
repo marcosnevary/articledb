@@ -1,6 +1,8 @@
 from articledb import tela_principal, tela_cadastro, tela_sintese, tela_edicao
-import flet as ft
 from articledb import banco_de_dados as bd
+
+import flet as ft
+
 
 def init(p):
     global pagina, telas, banco_de_dados

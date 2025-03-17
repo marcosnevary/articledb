@@ -65,7 +65,7 @@ def atualizar_tabela(lista_artigos):
 
         for id_coluna, coluna in enumerate(linha): #pegando cada item da linha da lista recebida e adicionando na linha final
             if id_coluna <= 5: #informacoes do artigo
-                lista_colunas.append(ft.DataCell(ft.Text(coluna)))
+                lista_colunas.append(ft.DataCell(ft.Text(coluna, selectable=True)))
             
             else: #leitores
                 sintese_leitor = bd.obter_dados_sintese()[linha[0]][coluna]["objetivo"] #pegando a sintese do leitor, no caso apenas o objetivo (vai mudar a cor do botao)
@@ -209,10 +209,10 @@ def adicionar_leitor(e):
         fechar_modal_leitor(e)
         limpar_pesquisa(e)
 
-        atualizar_feedback(f'O leitor "{nome_leitor}" foi adicionado com sucesso.' , 'green') #mensagem de feedback
+        atualizar_feedback_tela_principal(f'O leitor "{nome_leitor}" foi adicionado com sucesso.' , 'green') #mensagem de feedback
 
 
-def mudar_cor_campo(e):
+def mudar_cor_campo_modal(e):
     """Vai alterar a cor do campo de leitor"""
     if modal_leitor.page:
         componentes["tf_novo_leitor"].current.border_color = "black"
@@ -238,7 +238,7 @@ def fechar_modal_leitor(e):
     componentes["tf_novo_leitor"].current.value = ""
     componentes["tf_edita_leitor"].current.value = ""
     atualizar_feedback_leitor("white", "")
-    mudar_cor_campo(e)
+    mudar_cor_campo_modal(e)
 
 
 def atualizar_feedback_leitor(cor, msg):
@@ -266,7 +266,7 @@ modal_leitor = ft.AlertDialog(
             ft.TextField(
                 label="Nome",
                 ref=componentes['tf_novo_leitor'],
-                on_change=mudar_cor_campo,
+                on_change=mudar_cor_campo_modal,
                 on_submit=adicionar_leitor,
                 input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
                 border="underline"
@@ -299,7 +299,7 @@ modal_leitor = ft.AlertDialog(
 )
 
 
-def atualizar_feedback(msg, cor):
+def atualizar_feedback_tela_principal(msg, cor):
     txt_mensagem_feedback.value = msg
     container_mensagem_feedback.bgcolor = cor
 
@@ -352,7 +352,7 @@ def excluir_artigo(e):
             tabela.columns = tabela.columns[:8]
             tabela.update()
 
-    atualizar_feedback(f'O artigo "{artigo_excluido[0]}" foi excluído com sucesso.', "red")
+    atualizar_feedback_tela_principal(f'O artigo "{artigo_excluido[0]}" foi excluído com sucesso.', "red")
     
 
 def abrir_modal_excluir_artigo(e):
@@ -439,7 +439,7 @@ def remover_leitor(e):
 
     #atualizando a tabela
     atualizar_tabela(bd.obter_dados_tabela())
-    atualizar_feedback(f'O leitor "{nome_leitor}" foi excluído com sucesso.', "red")
+    atualizar_feedback_tela_principal(f'O leitor "{nome_leitor}" foi excluído com sucesso.', "red")
 
     tabela.update()
 
@@ -523,7 +523,7 @@ def editar_leitor(e):
         #atualizando a tabela
         atualizar_tabela(bd.obter_dados_tabela())
         fechar_modal_leitor(e)
-        atualizar_feedback(f'O leitor "{nome_atual}" foi renomeado para "{novo_nome}" com sucesso.', "green")
+        atualizar_feedback_tela_principal(f'O leitor "{nome_atual}" foi renomeado para "{novo_nome}" com sucesso.', "green")
         limpar_pesquisa(e)
 
 
@@ -535,7 +535,7 @@ modal_edita_leitor = ft.AlertDialog(
             ft.TextField(
                 label="Nome",
                 ref=componentes["tf_edita_leitor"],
-                on_change=mudar_cor_campo,
+                on_change=mudar_cor_campo_modal,
                 input_filter=ft.InputFilter(regex_string=r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"),
                 border="underline",
                 on_submit=editar_leitor
@@ -621,6 +621,8 @@ if dados_tabela:
 #atualizando a tabela inicialmente
 atualizar_tabela(dados_tabela)
 
+
+#View
 def view():
     return ft.View(
         route="Tela Principal",

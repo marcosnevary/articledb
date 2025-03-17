@@ -1,13 +1,16 @@
+import os
+
 import flet as ft
+
 from articledb import tela_principal
 from articledb import controle
 from articledb import banco_de_dados as bd
+from articledb.tela_cadastro import obter_campo_leitores, rotulo_dica
 from articledb.tela_sintese import modal_confirmacao
-from articledb.tela_cadastro import mudar_cor_campo
-from articledb.tela_principal import atualizar_feedback
-from articledb.utils import largura, criar_botao_sair, criar_botao_salvar
+from articledb.tela_principal import atualizar_feedback_tela_principal
+from articledb.utils import largura
 from articledb.validacoes import validar_titulo, validar_link, validar_autores, validar_ano, validar_local, validar_abstracts
-import os
+
 
 CAMINHO_EDICAO = os.path.join("imagens", "edicao.png")
 
@@ -75,10 +78,10 @@ def sair(e):
     if dados_iniciais != dados_finais:
         controle.pagina.open(modal_confirmacao)
     else:
-        voltar(e)
+        voltar_e2p(e)
 
 
-def voltar(e):
+def voltar_e2p(e):
     for chave in componentes.keys():
         componentes[chave].current.border_color = ft.colors.BLACK
         componentes[chave].current.focused_border_color = "#3C618B"
@@ -135,8 +138,8 @@ def salvar_edicao(e):
             del dados_sintese[titulo_antigo]
             bd.atualizar_dados_sintese(dados_sintese)
         
-        voltar(e)
-        atualizar_feedback(f'O artigo "{titulo_antigo}" foi editado com sucesso.', "green")
+        voltar_e2p(e)
+        atualizar_feedback_tela_principal(f'O artigo "{titulo_antigo}" foi editado com sucesso.', "green")
 
     
 
@@ -153,7 +156,7 @@ modal_confirmacao = ft.AlertDialog(
             bgcolor="#3254B4",
             icon_color="white",
             width=200,
-            on_click=voltar
+            on_click=voltar_e2p,
         ),
         ft.ElevatedButton(
             "Não",
@@ -162,19 +165,13 @@ modal_confirmacao = ft.AlertDialog(
             bgcolor="#3254B4",
             icon_color="white",
             width=200,
-            on_click=lambda e: controle.pagina.close(modal_confirmacao)
-        )
-    ]
+            on_click=lambda e: controle.pagina.close(modal_confirmacao),
+        ),
+    ],
 )
 
-def obter_campo_leitores():
-    dados_tabela = bd.obter_dados_tabela()
-    if dados_tabela:
-        return dados_tabela[0][6:]
-    else:
-        return []
 
-
+# View
 def view(existe_leitor: bool):
     return ft.View(
         route="Tela de Edição",
@@ -188,9 +185,13 @@ def view(existe_leitor: bool):
                             ref=componentes[rotulo_componente[rotulo]],
                             on_change=mudar_cor_campo,
                             width=largura,
-                            border="underline"
-                        ) for rotulo in rotulo_componente
-                    ] + [
+                            border="underline",
+                            hint_text=rotulo_dica[rotulo],
+                            hint_style=ft.TextStyle(color="#BABABA")
+                        )
+                        for rotulo in rotulo_componente
+                    ]
+                    + [
                         ft.TextField(
                             label=f"Leitor {i + 1}",
                             value=leitor,
@@ -222,15 +223,15 @@ def view(existe_leitor: bool):
                                     width=295
                                 )
                             ],
-                            alignment=ft.MainAxisAlignment.CENTER
-                        )
+                            alignment=ft.MainAxisAlignment.CENTER,
+                        ),
                     ],
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
-                padding=30
-            )
+                padding=30,
+            ),
         ],
         padding=0,
         bgcolor=ft.colors.WHITE,
-        scroll=ft.ScrollMode.AUTO
+        scroll=ft.ScrollMode.AUTO,
     )

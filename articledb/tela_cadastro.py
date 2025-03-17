@@ -1,13 +1,18 @@
+import os
+import datetime
+
 import flet as ft
+
 from articledb import banco_de_dados as bd
 from articledb import controle
-from articledb.tela_principal import atualizar_tabela, atualizar_feedback
+from articledb.tela_principal import atualizar_tabela, atualizar_feedback_tela_principal
 from articledb.validacoes import validar_titulo, validar_link, validar_autores, validar_ano, validar_local, validar_abstracts
-import os
 from articledb import validacoes
 from articledb.utils import largura
 
+
 CAMINHO_CADASTRO = os.path.join("imagens", "cadastro.png")
+
 
 rotulo_componente = {
     "Título": "titulo",
@@ -18,6 +23,7 @@ rotulo_componente = {
     "Abstracts": "abstracts"
 }
 
+
 componentes = {
     "titulo": ft.Ref[ft.TextField](),
     "link": ft.Ref[ft.TextField](),
@@ -25,7 +31,18 @@ componentes = {
     "ano": ft.Ref[ft.TextField](),
     "local": ft.Ref[ft.TextField](),
     "abstracts": ft.Ref[ft.TextField]()
-}    
+}
+
+
+rotulo_dica = {
+    "Título": "",
+    "Link": "Deve começar com http:// ou https:// (exemplo: https://x.com)",
+    "Autores": "Autor1, Autor2, Autor3 etc.",
+    "Ano": f"Entre 1665 e {datetime.datetime.now().year}",
+    "Local de Publicação": "Cidade",
+    "Abstracts": ""
+}
+
 
 feedback_cadastro = ft.Container(
     content=ft.Text(value="", color="white"),
@@ -54,7 +71,7 @@ def mudar_cor_campo(e):
         atualizar_feedback_cadastro("", "white")
 
 
-def voltar(e):
+def voltar_c2p(e):
     for chave in componentes.keys():
         componentes[chave].current.border_color = "black"
         componentes[chave].current.focused_border_color = "#3C618B"
@@ -120,8 +137,8 @@ def salvar_cadastro(e):
         bd.atualizar_dados_tabela(["|".join(linha) for linha in dados_tabela])
         bd.atualizar_dados_sintese(dados_sintese)
 
-        voltar(e)
-        atualizar_feedback(f'O artigo "{titulo}" foi adicionado com sucesso.', 'green')
+        voltar_c2p(e)
+        atualizar_feedback_tela_principal(f'O artigo "{titulo}" foi adicionado com sucesso.', 'green')
         
 
 def obter_campo_leitores():
@@ -132,6 +149,7 @@ def obter_campo_leitores():
         return []
 
 
+#View
 def view(existe_leitor=False):
     return ft.View(
         route="Tela de Cadastro",
@@ -146,7 +164,9 @@ def view(existe_leitor=False):
                             width=largura,
                             on_change=mudar_cor_campo,
                             border="underline",
-                            input_filter=validacoes.componente_filtro[rotulo]
+                            input_filter=validacoes.componente_filtro[rotulo],
+                            hint_text=rotulo_dica[rotulo],
+                            hint_style=ft.TextStyle(color="#BABABA"),
                         ) for rotulo in rotulo_componente
                     ] + 
                     [
@@ -164,7 +184,7 @@ def view(existe_leitor=False):
                             controls=[
                                 ft.ElevatedButton(
                                     "Sair",
-                                    on_click=voltar,
+                                    on_click=voltar_c2p,
                                     icon="CLEAR",
                                     color="white",
                                     bgcolor="#3254B4",
