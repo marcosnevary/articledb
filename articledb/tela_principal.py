@@ -22,7 +22,7 @@ tabela = ft.DataTable(
         ft.DataColumn(ft.Text("Título", weight="bold")),
         ft.DataColumn(ft.Text("Link", weight="bold")),
         ft.DataColumn(ft.Text("Autores", weight="bold")),
-        ft.DataColumn(ft.Text("Ano", weight="bold")),
+        ft.DataColumn(ft.Text("Ano de \nPublicação", weight="bold")),
         ft.DataColumn(ft.Text("Local de\nPublicação", weight="bold")),
         ft.DataColumn(ft.Text("Abstracts", weight="bold"))
     ]
@@ -311,7 +311,8 @@ def atualizar_feedback_tela_principal(msg, cor):
     txt_mensagem_feedback.value = ""
     container_mensagem_feedback.bgcolor = "white"
 
-    controle.pagina.update()
+    if container_mensagem_feedback.page:
+        controle.pagina.update()
 
 
 txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)

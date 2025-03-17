@@ -16,7 +16,7 @@ componente_filtro = {
     "Título": ft.InputFilter(regex_string=FILTRO_TITULO, allow=True, replacement_string=""),
     "Link": ft.InputFilter(regex_string=FILTRO_LINK, allow=True, replacement_string=""),
     "Autores": ft.InputFilter(regex_string=FILTRO_AUTORES, allow=True, replacement_string=""),
-    "Ano": ft.InputFilter(regex_string=FILTRO_ANO, allow=True, replacement_string=""),
+    "Ano de Publicação": ft.InputFilter(regex_string=FILTRO_ANO, allow=True, replacement_string=""),
     "Local de Publicação": ft.InputFilter(regex_string=FILTRO_LOCAL, allow=True, replacement_string=""),
     "Abstracts": ft.InputFilter(regex_string=FILTRO_ABSTRACTS, allow=True, replacement_string=""),
 }

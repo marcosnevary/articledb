@@ -18,7 +18,7 @@ rotulo_componente = {
     "Título": "titulo",
     "Link": "link",
     "Autores": "autores",
-    "Ano": "ano",
+    "Ano de Publicação": "ano",
     "Local de Publicação": "local",
     "Abstracts": "abstracts"
 }
@@ -38,7 +38,7 @@ rotulo_dica = {
     "Título": "",
     "Link": "Deve começar com http:// ou https:// (exemplo: https://x.com)",
     "Autores": "Autor1, Autor2, Autor3 etc.",
-    "Ano": f"Entre 1665 e {datetime.datetime.now().year}",
+    "Ano de Publicação": f"Entre 1665 e {datetime.datetime.now().year}",
     "Local de Publicação": "",
     "Abstracts": ""
 }

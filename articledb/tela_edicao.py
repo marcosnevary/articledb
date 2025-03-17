@@ -18,7 +18,7 @@ rotulo_componente = {
     "Título": "titulo",
     "Link": "link",
     "Autores": "autores",
-    "Ano": "ano",
+    "Ano de Publicação": "ano",
     "Local de Publicação": "local",
     "Abstracts": "abstracts"
 }
