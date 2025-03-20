@@ -1,12 +1,9 @@
 import os
-
 import flet as ft
-
 from articledb import tela_principal
 from articledb import controle
 from articledb import banco_de_dados as bd
 from articledb.tela_cadastro import obter_campo_leitores, rotulo_dica
-from articledb.tela_sintese import modal_confirmacao
 from articledb.tela_principal import atualizar_feedback_tela_principal
 from articledb.utils import largura
 from articledb.validacoes import validar_titulo, validar_link, validar_autores, validar_ano, validar_local, validar_abstracts
@@ -35,11 +32,12 @@ componentes = {
 feedback_edicao = ft.Container(
     content=ft.Text(value="", color="white"),
     alignment=ft.alignment.center,
-    bgcolor="white", 
+    bgcolor="white",
     width=largura,
     height=25,
     border_radius=10
 )
+
 
 def atualizar_feedback_edicao(msg, cor):
     feedback_edicao.content.value = msg
@@ -105,12 +103,14 @@ def salvar_edicao(e):
             campos.append(list(rotulo_componente.keys())[i])
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
-    
+
     if campos and len(campos) == 1:
         atualizar_feedback_edicao(f'O campo "{campos[0]}" é inválido.', "red")
-    
+
     elif campos and len(campos) > 1:
-        atualizar_feedback_edicao(f'Os campos "{", ".join(campos)}" são inválidos.', "red")
+        atualizar_feedback_edicao(
+            f'Os campos "{", ".join(campos)}" são inválidos.', "red"
+        )
 
     dados_finais = obter_dados_finais() + dados_iniciais[6:]
     dados_tabela = bd.obter_dados_tabela()
@@ -121,7 +121,9 @@ def salvar_edicao(e):
     titulo_nao_existe = True
     for linha in dados_tabela:
         if titulo_antigo != titulo_novo and titulo_novo.upper() == linha[0].upper():
-            atualizar_feedback_edicao(f'Já existe um artigo cadastrado com esse título.', "red")
+            atualizar_feedback_edicao(
+                'Já existe um artigo cadastrado com esse título.', "red"
+            )
             titulo_nao_existe = False
             componentes["titulo"].current.border_color = ft.colors.RED
             componentes["titulo"].current.update()
@@ -137,11 +139,12 @@ def salvar_edicao(e):
             dados_sintese[titulo_novo] = dados_sintese[titulo_antigo]
             del dados_sintese[titulo_antigo]
             bd.atualizar_dados_sintese(dados_sintese)
-        
-        voltar_e2p(e)
-        atualizar_feedback_tela_principal(f'O artigo "{titulo_antigo}" foi editado com sucesso.', "green")
 
-    
+        voltar_e2p(e)
+        atualizar_feedback_tela_principal(
+            f'O artigo "{titulo_antigo}" foi editado com sucesso.', "green"
+        )
+
 
 modal_confirmacao = ft.AlertDialog(
     modal=True,

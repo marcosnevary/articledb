@@ -1,7 +1,5 @@
 from time import sleep
-
 import flet as ft
-
 from articledb import controle
 
 # GERAL
@@ -13,7 +11,7 @@ def atualizar_feedback_tela_principal(msg, cor):
 
     controle.pagina.update()
 
-    #voltando a cor e texto ao original
+    # voltando a cor e texto ao original
     sleep(10)
     txt_mensagem_feedback.value = ""
     container_mensagem_feedback.bgcolor = "white"
@@ -21,7 +19,7 @@ def atualizar_feedback_tela_principal(msg, cor):
     controle.pagina.update()
 
 
-txt_mensagem_feedback = ft.Text(value = "", expand=True, color=ft.colors.WHITE)
+txt_mensagem_feedback = ft.Text(value="", expand=True, color=ft.colors.WHITE)
 
 
 container_mensagem_feedback = ft.Container(
