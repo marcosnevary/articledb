@@ -5,7 +5,7 @@ padrao_link = ''.join(
     (
         r"https?://",                                   #  Protocolo http ou https
         r"(?=[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-]+)",          #  Deve haver pelo menos um ponto entre domínios
-        r"(?!.*[\?\#&=%@_\-]$)",                            #  Não pode terminar com certos caracteres na URL
+        r"(?!.*[\?\#&=%@_\-]$)",                        #  Não pode terminar com certos caracteres na URL
         r"[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]{4,}"    #  4 caracteres ou mais no resto da URL
     )
 )

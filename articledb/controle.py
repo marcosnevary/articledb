@@ -1,6 +1,7 @@
 from articledb import tela_principal, tela_cadastro, tela_sintese, tela_edicao
 from articledb import banco_de_dados as bd
 
+
 def init(p):
     global pagina, telas, banco_de_dados
     pagina = p
@@ -21,7 +22,7 @@ def controle_de_rota(route_event):
             telas["2"] = tela_cadastro.view()
         else:
             telas["2"] = tela_cadastro.view()
-            
+
     if pagina.route == "3":
         global dados_sintese
         dados_sintese = bd.obter_dados_sintese()
@@ -36,5 +37,5 @@ def controle_de_rota(route_event):
             telas["4"] = tela_edicao.view()
         tela_edicao.atualizar_edicao()
 
-    pagina.views.append(telas[route_event.route])  
+    pagina.views.append(telas[route_event.route])
     pagina.update()

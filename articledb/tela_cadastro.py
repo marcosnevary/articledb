@@ -1,8 +1,6 @@
 import os
 import datetime
-
 import flet as ft
-
 from articledb import banco_de_dados as bd
 from articledb import controle
 from articledb.tela_principal import atualizar_tabela, atualizar_feedback_tela_principal
@@ -10,19 +8,16 @@ from articledb.validacoes import validar_titulo, validar_link, validar_autores, 
 from articledb import validacoes
 from articledb.utils import largura
 
-
 CAMINHO_CADASTRO = os.path.join("imagens", "cadastro.png")
-
 
 rotulo_componente = {
     "Título": "titulo",
     "Link": "link",
     "Autores": "autores",
-    "Ano": "ano",
+    "Ano de Publicação": "ano",
     "Local de Publicação": "local",
     "Abstracts": "abstracts"
 }
-
 
 componentes = {
     "titulo": ft.Ref[ft.TextField](),
@@ -33,25 +28,24 @@ componentes = {
     "abstracts": ft.Ref[ft.TextField]()
 }
 
-
 rotulo_dica = {
     "Título": "",
     "Link": "Deve começar com http:// ou https:// (exemplo: https://x.com)",
     "Autores": "Autor1, Autor2, Autor3 etc.",
-    "Ano": f"Entre 1665 e {datetime.datetime.now().year}",
+    "Ano de Publicação": f"Entre 1665 e {datetime.datetime.now().year}",
     "Local de Publicação": "",
     "Abstracts": ""
 }
 
-
 feedback_cadastro = ft.Container(
     content=ft.Text(value="", color="white"),
     alignment=ft.alignment.center,
-    bgcolor="white", 
+    bgcolor="white",
     width=largura,
     height=25,
     border_radius=10
 )
+
 
 def atualizar_feedback_cadastro(msg, cor):
     feedback_cadastro.content.value = msg
@@ -98,12 +92,16 @@ def salvar_cadastro(e):
             campos.append(list(rotulo_componente.keys())[i])
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
-    
+
     if campos and len(campos) == 1:
-        atualizar_feedback_cadastro(f'O campo "{campos[0]}" é inválido.', "red")
-    
+        atualizar_feedback_cadastro(
+            f'O campo "{campos[0]}" é inválido.', "red"
+        )
+
     elif campos and len(campos) > 1:
-        atualizar_feedback_cadastro(f'Os campos "{", ".join(campos)}" são inválidos.', "red")
+        atualizar_feedback_cadastro(
+            f'Os campos "{", ".join(campos)}" são inválidos.', "red"
+        )
 
     dados_tabela = bd.obter_dados_tabela()
     dados_sintese = bd.obter_dados_sintese()
@@ -113,7 +111,9 @@ def salvar_cadastro(e):
     titulo_nao_existe = True
     for linha in dados_tabela:
         if titulo.upper() == linha[0].upper():
-            atualizar_feedback_cadastro(f'Já existe um artigo cadastrado com esse título.', "red")
+            atualizar_feedback_cadastro(
+                'Já existe um artigo cadastrado com esse título.', "red"
+            )
             titulo_nao_existe = False
             componentes["titulo"].current.border_color = ft.colors.RED
             componentes["titulo"].current.update()
@@ -126,20 +126,22 @@ def salvar_cadastro(e):
         dados_tabela = bd.obter_dados_tabela()
         leitores = dados_tabela[0][6:] if dados_tabela and len(dados_tabela[0]) > 6 else []
         for leitor in leitores:
-            dados_sintese[titulo][leitor]= {
+            dados_sintese[titulo][leitor] = {
                 "objetivo": "",
                 "contribuicoes": "",
                 "lacunas": "",
                 "observacoes": ""
             }
-        
+
         dados_tabela.append(artigo + leitores)
         bd.atualizar_dados_tabela(["|".join(linha) for linha in dados_tabela])
         bd.atualizar_dados_sintese(dados_sintese)
 
         voltar_c2p(e)
-        atualizar_feedback_tela_principal(f'O artigo "{titulo}" foi adicionado com sucesso.', 'green')
-        
+        atualizar_feedback_tela_principal(
+            f'O artigo "{titulo}" foi adicionado com sucesso.', 'green'
+        )
+
 
 def obter_campo_leitores():
     dados_tabela = bd.obter_dados_tabela()
@@ -149,7 +151,7 @@ def obter_campo_leitores():
         return []
 
 
-#View
+# View
 def view():
     return ft.View(
         route="Tela de Cadastro",
@@ -168,7 +170,7 @@ def view():
                             hint_text=rotulo_dica[rotulo],
                             hint_style=ft.TextStyle(color="#BABABA"),
                         ) for rotulo in rotulo_componente
-                    ] + 
+                    ] +
                     [
                         ft.TextField(
                             label=f"Leitor {i + 1}",
@@ -177,7 +179,7 @@ def view():
                             width=largura,
                             border="underline"
                         ) for i, leitor in enumerate(obter_campo_leitores())
-                    ] + 
+                    ] +
                     [
                         feedback_cadastro,
                         ft.Row(

@@ -1,16 +1,12 @@
 import os
-
 import flet as ft
-
 from articledb import controle
 from articledb import banco_de_dados as bd
 from articledb import tela_principal
 from articledb.utils import largura
 from articledb.feedback import feedback_registro, atualizar_feedback_registro
 
-
 CAMINHO_SINTESE = os.path.join("imagens", "sintese.png")
-
 
 rotulo_componente = {
     "Objetivo": "objetivo",
@@ -29,11 +25,12 @@ componentes = {
 feedback_sintese = ft.Container(
     content=ft.Text(value="", color="white"),
     alignment=ft.alignment.center,
-    bgcolor="white", 
+    bgcolor="white",
     width=largura,
     height=25,
     border_radius=10
 )
+
 
 def atualizar_feedback_sintese(cor, msg):
     feedback_sintese.bgcolor = cor
@@ -77,11 +74,12 @@ def salvar_sintese(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            atualizar_feedback_registro("red", "Campo(s) obrigatório(s) não preenchido(s).")
+            atualizar_feedback_registro(
+                "red", "Campo(s) obrigatório(s) não preenchido(s)."
+            )
     if permissao:
         dados_finais = obter_dados_finais()
         controle.dados_sintese[tela_principal.artigo][tela_principal.leitor] = dados_finais
-        # print(dados_finais)
         bd.atualizar_dados_sintese(controle.dados_sintese)
         voltar(e)
         tela_principal.atualizar_feedback_tela_principal(
@@ -113,6 +111,7 @@ campo_leitor = ft.TextField(
     width=largura,
     border="underline"
 )
+
 
 def atualizar_sintese():
     global dados_iniciais
@@ -151,7 +150,7 @@ modal_confirmacao = ft.AlertDialog(
 )
 
 
-#View
+# View
 def view():
     return ft.View(
         route="Tela de Síntese",
@@ -172,7 +171,7 @@ def view():
                             width=largura,
                             multiline=True
                         ) for rotulo in rotulo_componente
-                    ] + 
+                    ] +
                     [
                         feedback_registro,
                         ft.Row(

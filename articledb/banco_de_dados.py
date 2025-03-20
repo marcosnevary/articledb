@@ -11,7 +11,8 @@ def obter_dados_tabela() -> list[list[str]] | list:
     Diretório esperado: `articledb/dados/dados_tabela.txt`
 
     Returns:
-        list[list[str]]: Lista de listas de string com dados da tabela, caso o arquivo exista.
+        list[list[str]]: Lista de listas de string com dados da tabela, caso o
+        arquivo exista.
 
         Se o arquivo não existir, retorna uma lista vazia.
 
@@ -28,7 +29,7 @@ def obter_dados_tabela() -> list[list[str]] | list:
 
             return [linha.strip().split("|") for linha in conteudo]
 
-    except:
+    except FileNotFoundError:
         with open(CAMINHO_TABELA, mode="x", encoding="UTF-8") as arq:
             return []
 
@@ -40,8 +41,9 @@ def atualizar_dados_tabela(dados_tabela: list) -> None:
     Diretório esperado: `articledb/dados/dados_tabela.txt`
 
     Args:
-        dados_tabela (list[str]): Lista de strings representando os dados da tabela.
-            
+        dados_tabela (list[str]): Lista de strings representando os dados da
+        tabela.
+
             Cada elemento da lista é uma linha do arquivo.
     """
 
@@ -56,9 +58,11 @@ def obter_dados_sintese() -> dict:
     Diretório esperado: `articledb/dados/dados_sintese.txt`
 
     Returns:
-        conteudo (dict): Dicionário de dicionários com dados de síntese, caso o arquivo exista.
+        conteudo (dict): Dicionário de dicionários com dados de síntese, caso o
+        arquivo exista.
 
-            Se o arquivo não existir ou a tabela estiver vazia, retorna um dicionário vazio.
+            Se o arquivo não existir ou a tabela estiver vazia, retorna um
+            dicionário vazio.
 
     Raises:
         FileNotFoundError: Se o arquivo não existir.
@@ -72,8 +76,8 @@ def obter_dados_sintese() -> dict:
                 return {}
 
             return eval(conteudo)
-       
-    except:
+
+    except FileNotFoundError:
         with open(CAMINHO_SINTESE, mode="w") as arq:
             return {}
 
@@ -85,10 +89,11 @@ def atualizar_dados_sintese(dados_sintese: dict) -> None:
     Diretório esperado: `articledb/dados/dados_sintese.txt`
 
     Args:
-        dados_tabela (dict): Dicionário de dicionários representando os dados da tabela.
-            
+        dados_tabela (dict): Dicionário de dicionários representando os dados
+        da tabela.
+
             As chaves do dicionário externo são leitores.
-            
+
             As chaves do dicionário interno são campos de síntese.
     """
 

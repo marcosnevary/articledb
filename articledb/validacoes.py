@@ -16,10 +16,11 @@ componente_filtro = {
     "Título": ft.InputFilter(regex_string=FILTRO_TITULO, allow=True, replacement_string=""),
     "Link": ft.InputFilter(regex_string=FILTRO_LINK, allow=True, replacement_string=""),
     "Autores": ft.InputFilter(regex_string=FILTRO_AUTORES, allow=True, replacement_string=""),
-    "Ano": ft.InputFilter(regex_string=FILTRO_ANO, allow=True, replacement_string=""),
+    "Ano de Publicação": ft.InputFilter(regex_string=FILTRO_ANO, allow=True, replacement_string=""),
     "Local de Publicação": ft.InputFilter(regex_string=FILTRO_LOCAL, allow=True, replacement_string=""),
     "Abstracts": ft.InputFilter(regex_string=FILTRO_ABSTRACTS, allow=True, replacement_string=""),
 }
+
 
 def validar_titulo(titulo: str) -> bool:
     """
@@ -27,7 +28,7 @@ def validar_titulo(titulo: str) -> bool:
 
     Mínimo: 3. Escolha arbitrária.
 
-    Máximo: 350. O maior título de artigo do mundo tem 345: 
+    Máximo: 350. O maior título de artigo do mundo tem 345:
     http://gomerpedia.org/wiki/What_is_the_longest_journal_article_title_in_the_literature%3F
 
     Args:
@@ -47,7 +48,7 @@ def validar_titulo(titulo: str) -> bool:
 
     if not re.fullmatch(FILTRO_TITULO, titulo):
         return False
-    
+
     return True
 
 
@@ -57,9 +58,9 @@ def validar_link(link: str) -> bool:
 
     Mínimo: 11. Menor URL válida: "http://a.bc"
 
-    Máximo: 2000. Recomendação do Google: 
+    Máximo: 2000. Recomendação do Google:
     https://support.google.com/webmasters/thread/278099742?hl=en&msgid=278133107
-    
+
     Args:
         valor (str): Valor no campo "Link".
 
@@ -73,19 +74,19 @@ def validar_link(link: str) -> bool:
 
     if not (11 <= len(link) <= 2000):
         return False
-    
+
     padrao_link = ''.join(
         (
-            r"https?://",                                   #  Protocolo http ou https
-            r"(?=[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-]+)",          #  Deve haver pelo menos um ponto entre domínios
-            r"(?!.*[\?\#&=%@_\-]$)",                        #  Não pode terminar com certos caracteres na URL
-            r"[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]{4,}"    #  4 caracteres (permitidos) ou mais no resto da URL
+            r"https?://",                                   # Protocolo http ou https
+            r"(?=[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-]+)",          # Deve haver pelo menos um ponto entre domínios
+            r"(?!.*[\?\#&=%@_\-]$)",                        # Não pode terminar com certos caracteres na URL
+            r"[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]{4,}"    # 4 caracteres (permitidos) ou mais no resto da URL
         )
     )
 
     if not re.fullmatch(padrao_link, link):
         return False
-    
+
     return True
 
 
@@ -96,7 +97,7 @@ def validar_autores(autores: str) -> bool:
     Mínimo: 5. Menor autor válido: "A, B."
 
     Máximo: 400. Escolha arbitrária
-    
+
     Args:
         valor (str): Valor no campo "Autores".
 
@@ -110,7 +111,7 @@ def validar_autores(autores: str) -> bool:
 
     if not (5 <= len(autores) <= 400):
         return False
-    
+
     return True
 
 
@@ -123,7 +124,7 @@ def validar_ano(ano: str) -> bool:
     Número mínimo: 1665. Periódico mais antigo da história: Journal des Sçavans.
 
     Máximo: Ano atual.
-    
+
     Args:
         valor (str): Valor no campo "Ano".
 
@@ -146,7 +147,7 @@ def validar_ano(ano: str) -> bool:
 
     if not (1665 <= ano_num <= datetime.datetime.now().year):
         return False
-    
+
     return True
 
 
@@ -154,9 +155,9 @@ def validar_local(local: str) -> bool:
     """
     Valida o campo de local de publicação.
 
-    Mínimo: 2. 
-    Máximo: 400. 
-    
+    Mínimo: 2.
+    Máximo: 400.
+
     Args:
         valor (str): Valor no campo "Local de Publicação".
 
@@ -170,10 +171,10 @@ def validar_local(local: str) -> bool:
 
     if not (2 <= len(local) <= 500):
         return False
-    
+
     if not re.fullmatch(FILTRO_LOCAL, local):
         return False
-    
+
     return True
 
 
@@ -198,14 +199,14 @@ def validar_abstracts(abstracts: str) -> bool:
 
     if not (1 <= len(abstracts) <= 2000):
         return False
-    
+
     if not re.fullmatch(FILTRO_ABSTRACTS, abstracts):
         return False
-    
+
     return True
 
 
-def tratar_string(string:str):
+def tratar_string(string: str):
     string = string.lower()
     string = re.sub(r"[ãàáâ]", "a", string)
     string = re.sub(r"[êéè]", "e", string)
@@ -216,16 +217,12 @@ def tratar_string(string:str):
     return string
 
 
-def achar_nome_tela_principal(string:str, artigo:list)->list:
+def achar_nome_tela_principal(string: str, artigo: list) -> list:
     string = tratar_string(string)
 
     for celula in artigo[:6]:
         texto = tratar_string(celula)
-        if re.match(string, texto): #retornando true se der match
+        if re.match(string, texto):  # retornando true se der match
             return True
-    
-    return False #retornando false se nada der match
 
-ft.Text(
-    
-)
+    return False  # retornando false se nada der match
