@@ -1,6 +1,7 @@
 from time import sleep
 import flet as ft
 from articledb import controle
+from utils import largura
 
 # GERAL
 
@@ -57,7 +58,7 @@ feedback_registro = ft.Container(
     content=ft.Text(value="", color="white"),
     alignment=ft.alignment.center,
     bgcolor="white",
-    width=500,
+    width=largura,
     height=25,
     border_radius=10,
 )
