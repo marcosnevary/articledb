@@ -1,7 +1,7 @@
 from time import sleep
 import flet as ft
 from articledb import controle
-from utils import largura
+from articledb.utils import largura
 
 # GERAL
 
