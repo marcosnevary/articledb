@@ -1,6 +1,6 @@
 import flet as ft
 
-largura = 600
+largura = 700
 regex_string = r"^[a-zA-ZÃÁÀÂãàáâÊÁÈêéèÍÎÌîíìÓÔÒÕóôòõÚÛÙúûùç\s]*$"
 
 
