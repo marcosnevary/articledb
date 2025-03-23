@@ -4,7 +4,6 @@ from articledb import controle
 from articledb import banco_de_dados as bd
 from articledb import tela_principal
 from articledb.utils import largura
-from articledb.feedback import feedback_registro, atualizar_feedback_registro
 
 CAMINHO_SINTESE = os.path.join("imagens", "sintese.png")
 
@@ -47,7 +46,7 @@ def mudar_cor_campo_sintese(e):
             componentes[componente].current.focused_border_color = "#3C618B"
             componentes[componente].current.update()
     if all(componentes[chave].current.value.strip() for chave in list(componentes.keys())[:3]):
-        atualizar_feedback_registro("white", "")
+        atualizar_feedback_sintese("white", "")
 
 
 def voltar(e):
@@ -57,7 +56,7 @@ def voltar(e):
         componentes[chave].current.update()
     tela_principal.atualizar_tabela(bd.obter_dados_tabela())
     controle.pagina.go('1')
-    atualizar_feedback_registro("white", "")
+    atualizar_feedback_sintese("white", "")
 
 
 def obter_dados_finais():
@@ -74,7 +73,7 @@ def salvar_sintese(e):
             componentes[chave].current.border_color = ft.colors.RED
             componentes[chave].current.update()
             permissao = False
-            atualizar_feedback_registro(
+            atualizar_feedback_sintese(
                 "red", "Campo(s) obrigatório(s) não preenchido(s)."
             )
     if permissao:
@@ -173,7 +172,7 @@ def view():
                         ) for rotulo in rotulo_componente
                     ] +
                     [
-                        feedback_registro,
+                        feedback_sintese,
                         ft.Row(
                             controls=[
                                 ft.ElevatedButton(
