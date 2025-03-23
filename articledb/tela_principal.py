@@ -118,7 +118,7 @@ def adicionar_leitor(e):
     atualizar o banco de dados com o novo leitor
     """
 
-    nome_leitor = componentes["tf_novo_leitor"].current.value
+    nome_leitor = componentes["tf_novo_leitor"].current.value.strip()
     dados_tabela = bd.obter_dados_tabela()
 
     if dados_tabela:  # verifica se o leitor ja existe caso exista algum dado
@@ -130,7 +130,7 @@ def adicionar_leitor(e):
 
     leitores = dados_tabela[0][6:]
 
-    if not nome_leitor.strip():  # nome digitado é vazio
+    if not nome_leitor:  # nome digitado é vazio
         atualizar_feedback_leitor("red", "Digite um nome válido.")
         componentes["tf_novo_leitor"].current.border_color = ft.colors.RED
         componentes["tf_novo_leitor"].current.update()
